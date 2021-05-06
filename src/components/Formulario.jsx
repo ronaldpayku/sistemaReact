@@ -1,7 +1,5 @@
 import React, { Fragment, useState } from 'react'
 import axios from 'axios';
-
-
 import '../index'
 
 const Formulario = () => {
@@ -12,7 +10,7 @@ const Formulario = () => {
           [e.target.name]: e.target.value,
         });
     };
-
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('entrando de nuevo')
@@ -20,14 +18,13 @@ const Formulario = () => {
         .then(axiosRes => setResult(JSON.stringify(axiosRes.data)))
         .catch(res => console.error(res.response))
     }
-
+    
     const apiRequest = (method,path,sendData,publicToken,sign="") => {
+        console.log(sendData)
         let sendDataCopy = '';
-        if(method === 'post' || method === 'put' || method === 'get' || method === 'delete') {
-          sendDataCopy = {...sendData}
-        sendDataCopy = JSON.parse(sendDataCopy)
-          
-          console.log(sendDataCopy)
+        if(method === 'post' || method === 'put') {
+            sendDataCopy = sendData
+            sendDataCopy = JSON.parse(sendDataCopy)
         }
         return axios({
           method: `${method}`,
@@ -35,19 +32,15 @@ const Formulario = () => {
           data: sendDataCopy,
           headers: {
             'Content-Type': 'application/json',
-            // Authorization: `Bearer ${publicToken}`,
-            Authorization: `Bearer ${request.publico}`,
-
+            Authorization: `Bearer ${publicToken}`,
             'Sign': sign,  
           }
         })
-      }
-    
-
+    }
+   
     const [request, setRequest] = useState('');
     const [result, setResult] = useState('');
    
-
     return (
         <Fragment>
             <div className="container">
@@ -57,7 +50,7 @@ const Formulario = () => {
                             <div className="title mt-5">
                                 <h2>Sistema Interno Payku</h2>
                             </div>
-
+                          
                             <div className="col-md-6">
                                 <label>
                                     Seleciona metodo de solicitud
@@ -70,8 +63,8 @@ const Formulario = () => {
                                     </select>
                                 </label>
                             </div>
+                          
                             <div className="row">
-                                
                                 <div className="col-md-6">
                                     <label>
                                     Selecciona Plataforma
@@ -82,7 +75,7 @@ const Formulario = () => {
                                         </select>
                                     </label>
                                 </div>
-                                
+                          
                                 <div className="col-md-6">
                                     <label>
                                         Selecciona el Endpoint
@@ -93,7 +86,7 @@ const Formulario = () => {
                                         </select>                                    
                                     </label>
                                 </div>
-                                
+                          
                                 <div className="col-md-6">
                                     <label>
                                         Token Publico
@@ -106,7 +99,7 @@ const Formulario = () => {
                                             />
                                     </label>
                                 </div>
-                                
+                          
                                 <div className="col-md-6">
                                     <label>
                                         Token Privado
@@ -119,7 +112,7 @@ const Formulario = () => {
                                             />
                                     </label>
                                 </div>
-                                
+                          
                                 <div className="col-md-12">
                                     <textarea
                                         name="codigo"
@@ -127,15 +120,14 @@ const Formulario = () => {
                                         onChange={ handleChange }
                                     />
                                 </div>
-                                
+                          
                                 <div className="col-md-12">
                                         <textarea
                                             value={ result }
                                             name="respuesta"
                                         />
-
                                 </div>
-                                
+                          
                                 <div className="col-md-12">
                                     <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
                                         <button className="me-md-2" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
@@ -144,14 +136,12 @@ const Formulario = () => {
                             </div>
                         </form>
                         <ul>
-                            
                         </ul>
                     </div>
                 </div>
             </div>
-            
         </Fragment>
     )
 }
-
 export default Formulario
+
