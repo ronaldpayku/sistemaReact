@@ -19,10 +19,12 @@ const Formulario = () => {
         apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
         .then(axiosRes => setResult(JSON.stringify(axiosRes.data)))
         .catch(res => console.error(res.response))
+
+        
     }
     
     const apiRequest = (method,path,sendData,publicToken,privateToken="",id="") => {
-        console.log(sendData)
+        // console.log(sendData)
         let sendDataCopy = '';
         if(method === 'post' || method === 'put') {
             sendDataCopy = sendData
@@ -35,12 +37,12 @@ const Formulario = () => {
         })
         const arrayConcat = new URLSearchParams(orderedData).toString()
         const concat = requestPath + "&" + arrayConcat;
-        console.log(concat)
+        // console.log(concat)
         const sign = CryptoJS.HmacSHA256(concat, 'fe551abcef62fcf002dc598922e68f0a').toString();
         console.log('firma:', sign)
     
 
-        console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
+        // console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
         
         return axios({
           method: `${method}`,
@@ -48,12 +50,26 @@ const Formulario = () => {
           data: sendDataCopy,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${publicToken}`,
+            Authorization: `Bearer ${request.publico}`,
             'Sign': sign,  
           }
         })
+
     }
-// console.clear()
+
+    // datos a enviar sign
+    // {
+    //     "email": "support@youwebsite.cl",
+    //     "name": "Joe Doe",
+    //     "phone": "923122312",
+    //     "address": "Moneda 101",
+    //     "country": "Chile",
+    //     "region": "Metropolitana",
+    //     "city": "Santiago",
+    //     "postal_code": "850000"
+    // }
+    
+    
     
     const [request, setRequest] = useState('');
     const [result, setResult] = useState('');
@@ -82,20 +98,7 @@ const Formulario = () => {
                                 />
                             </div>
 
-                            {/* <fieldset disabled>
-                                <div className="mb-3">
-                                    <label className="form-label">Identificador</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control"
-                                        name="id" 
-                                        placeholder="Ingresa ID a Consultar"
-                                        onChange={ handleChange }
-                                    />
-                                </div>
-                            </fieldset> */}
-
-                               
+                                                           
                             <div className="col-md-6">
                                 <label>
                                     Seleciona metodo a Solicitar
@@ -118,13 +121,24 @@ const Formulario = () => {
                                     Selecciona Plataforma
                                         <select onChange={ handleChange } name="url" className="form-select mb-5 mt-2 text-color">
                                             <option defaultValue selected disabled>Url</option>
-                                            <option value="https://des.payku.cl/">https://des.payku.cl/</option>
+                                            <option value="https://des.payku.cl">https://des.payku.cl/</option>
                                             <option defaultValue="https://app.payku.cl/">https://app.payku.cl/</option>
                                         </select>
                                     </label>
                                 </div>
                           
                                 <div className="col-md-6">
+                                    {/* <label>
+                                        Escribe el Endpoint
+                                        <input
+                                            className="mt-2"
+                                            type="text"
+                                            name="endpoint"
+                                            placeholder="Ingresa endpoint"
+                                            onChange={ handleChange }
+                                            />
+                                    </label> */}
+
                                     <label>
                                         Selecciona el Endpoint
                                         <select className="form-select mb-5 mt-2 text-color" onChange={ handleChange } name="endpoint">
