@@ -47,7 +47,7 @@ const Formulario = () => {
             
             } catch (error) {
 
-                setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)}, \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
+                setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)} \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
 
                 
             }            
@@ -98,23 +98,22 @@ const Formulario = () => {
                                 <h2>Sistema Interno Payku</h2>
                             </div>
 
-                            <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label>Identificador</label>
-                                            
-                                                <input
-                                                    type="text" 
-                                                    name="id"
-                                                    className="form-control mb-5 mt-2" 
-                                                    placeholder="Coloca un / antes de ingresar el ID a Consultar"
-                                                    onChange={ handleChange } 
-                                                    
-                                                /> 
+                                <div className="row">
+                                    <div className="col-md-4">
+                                        <div className="form-group"> 
+                                            <label>Selecciona Plataforma</label> 
+                                                <select onChange={ handleChange } 
+                                                    name="url" 
+                                                    className="form-control form-control-lg mb-5 mt-2 text-color">
+                                                        <option defaultValue selected disabled>Url</option>
+                                                        <option value="https://des.payku.cl">Desarrollo</option>
+                                                        <option defaultValue="https://app.payku.cl/">Produccion</option>
+                                                        <option defaultValue="https://devqa.payku.cl/">QA</option>
+                                                </select> 
                                         </div>
                                     </div>
                                     
-                                    <div className="col-md-6">
+                                    <div className="col-md-4">
                                         <div className="form-group"> 
                                             <label>Seleciona metodo a Solicitar</label> 
                                                 <select onChange={ handleChange } 
@@ -128,95 +127,67 @@ const Formulario = () => {
                                             </select> 
                                         </div>
                                     </div>
-                            </div>
                                 
+                                    <div className="col-md-4">
+                                        <div className="form-group"> 
+                                            <label>Selecciona el Endpoint</label> 
+                                                <select onChange={ handleChange } 
+                                                    name="endpoint" 
+                                                    className="form-control form-control-lg mb-5 mt-2 text-color" 
+                                                    required="required" 
+                                                    data-error="Especifica el endPoint">
+                                                        <option defaultValue selected disabled>Endpoint</option>
+                                                        <option value="/api/transaction">transaction</option>
+                                                        <option defaultValue="api/verificar/">verificar</option>
+                                                        <option defaultValue="api/maclient/">maClient</option>
+                                                        <option defaultValue="api/maaffiliation/">maAffiliation</option>
+                                                        <option value="/api/suclient/">suClient</option>
+                                                        <option defaultValue="api/suclient/customers/">suClient/customers</option>
+                                                        <option defaultValue="api/sususcription/">suSuscription</option>
+                                                        <option defaultValue="api/sutransaction/">suTransaction</option>
+                                                        <option defaultValue="api/suinscriptionscards/">suInscriptionscards</option>
+                                                        <option defaultValue="api/suplan/">suPlan</option>
+                                                        <option defaultValue="api/suplan/plans/">suPlan/plans</option>
+                                                        <option defaultValue="urlnotifysuscription/">urlNotifySuscription</option>
+                                                        <option defaultValue="urlnotifypayment/">urlNotifyPayment</option>
+                                                        <option defaultValue="api/event/">event</option>
+                                                </select> 
+                                        </div>
+                                    </div>
+
+                                    {/* Cuadro de texto del endpoint */}
+                                        {/* <div className="col-md-4">
+                                            <div className="form-group">
+                                                <label>Escribe el EndPoint</label>
+                                                    <input
+                                                        type="text" 
+                                                        name="endpoint"
+                                                        className="form-control mb-5 mt-2 text-color" 
+                                                        placeholder="EndPoint"
+                                                        onChange={ handleChange } 
+                                                    /> 
+                                            </div>
+                                        </div> */}
+
+                                </div>
+                                   
                                     <div className="row">
-                                        <div className="col-md-6 ">
-                                            <div className="form-group"> 
-                                                <label>Selecciona Plataforma</label> 
-                                                    <select onChange={ handleChange } 
-                                                        name="url" 
-                                                        className="form-control form-control-lg mb-5 mt-2 text-color">
-                                                            <option defaultValue selected disabled>Url</option>
-                                                            <option value="https://des.payku.cl">Desarrollo</option>
-                                                            <option defaultValue="https://app.payku.cl/">Produccion</option>
-                                                            <option defaultValue="https://devqa.payku.cl/">QA</option>
-                                                    </select> 
+                                        <div className="col-md-4">
+                                            <div className="form-group">
+                                                <label>Identificador</label>
+                                                
+                                                    <input
+                                                        type="text" 
+                                                        name="id"
+                                                        className="form-control mb-5" 
+                                                        placeholder="Coloca un / antes de ingresar el ID a Consultar"
+                                                        onChange={ handleChange } 
+                                                        
+                                                    /> 
                                             </div>
                                         </div>
-
-                                    <div className="col-md-6">
-                                        <div className="form-group"> 
-                                        <label>Selecciona el Endpoint</label> 
-                                            <select onChange={ handleChange } 
-                                                name="endpoint" 
-                                                className="form-control form-control-lg mb-5 mt-2 text-color" 
-                                                required="required" 
-                                                data-error="Especifica el endPoint">
-                                                    <option defaultValue selected disabled>Endpoint</option>
-                                                    <option value="/api/transaction">transaction</option>
-                                                    <option defaultValue="api/verificar/">verificar</option>
-                                                    <option defaultValue="api/maclient/">maClient</option>
-                                                    <option defaultValue="api/maaffiliation/">maAffiliation</option>
-                                                    <option value="/api/suclient/">suClient</option>
-                                                    <option defaultValue="api/suclient/customers/">suClient/customers</option>
-                                                    <option defaultValue="api/sususcription/">suSuscription</option>
-                                                    <option defaultValue="api/sutransaction/">suTransaction</option>
-                                                    <option defaultValue="api/suinscriptionscards/">suInscriptionscards</option>
-                                                    <option defaultValue="api/suplan/">suPlan</option>
-                                                    <option defaultValue="api/suplan/plans/">suPlan/plans</option>
-                                                    <option defaultValue="urlnotifysuscription/">urlNotifySuscription</option>
-                                                    <option defaultValue="urlnotifypayment/">urlNotifyPayment</option>
-                                                    <option defaultValue="api/event/">event</option>
-                                                </select> 
-                                            </div>
-                                    </div>
-                                </div>      
-
-                                    {/* <label className="form-label">
-                                        Seleciona Plataforma
-                                        <select onChange={ handleChange } name="url" className="form-select mb-5 mt-2 text-color">
-                                            <option defaultValue selected disabled>Url</option>
-                                            <option value="https://des.payku.cl">Desarrollo</option>
-                                            <option defaultValue="https://app.payku.cl/">Produccion</option>
-                                            <option defaultValue="https://devqa.payku.cl/">QA</option>
-                                        </select>
-                                    </label> */}
-
-                                    {/* <label className="form-label">
-                                        Selecciona el Endpoint
-                                        <select onChange={ handleChange } name="endpoint" className="form-select mb-5 mt-2 text-color">
-                                        <option defaultValue selected disabled>Endpoint</option>
-                                            <option value="/api/transaction">transaction</option>
-                                            <option defaultValue="api/verificar/">verificar</option>
-                                            <option defaultValue="api/maclient/">maClient</option>
-                                            <option defaultValue="api/maaffiliation/">maAffiliation</option>
-                                            <option value="/api/suclient/">suClient</option>
-                                            <option defaultValue="api/suclient/customers/">suClient/customers</option>
-                                            <option defaultValue="api/sususcription/">suSuscription</option>
-                                            <option defaultValue="api/sutransaction/">suTransaction</option>
-                                            <option defaultValue="api/suinscriptionscards/">suInscriptionscards</option>
-                                            <option defaultValue="api/suplan/">suPlan</option>
-                                            <option defaultValue="api/suplan/plans/">suPlan/plans</option>
-                                            <option defaultValue="urlnotifysuscription/">urlNotifySuscription</option>
-                                            <option defaultValue="urlnotifypayment/">urlNotifyPayment</option>
-                                            <option defaultValue="api/event/">event</option>
-                                        </select>
-                                    </label> */}
-
-                                    {/* <div className="col">
-                                        <label className="form-label">Selecciona el Endpoint</label>
-                                            <input                                        
-                                                type="text" 
-                                                className="form-control mb-5"
-                                                name="id" 
-                                                placeholder="Ingresa el EndPonit"
-                                                onChange={ handleChange }
-                                            />
-                                    </div>                             */}
-                          
-                                    <div className="row">
-                                        <div className="col-md-6">
+                                    
+                                        <div className="col-md-4">
                                             <div className="form-group"> 
                                                 <label>Token Publico</label> 
                                                     <input 
@@ -225,11 +196,11 @@ const Formulario = () => {
                                                         className="form-control" 
                                                         placeholder="Ingresa Token Publico" 
                                                         onChange={ handleChange }
-                                                    /> 
+                                                        /> 
                                             </div>
                                         </div>
 
-                                        <div className="col-md-6">
+                                        <div className="col-md-4">
                                             <div className="form-group"> 
                                                 <label>Token Privado</label> 
                                                     <input 
@@ -238,42 +209,17 @@ const Formulario = () => {
                                                         className="form-control mb-5" 
                                                         placeholder="Ingresa Token Privado"
                                                         onChange={ handleChange }
-                                                    /> 
+                                                        /> 
                                             </div>
                                             </div>
-                                        </div>
-
-                                {/* <div className="row">
-                                    <div className="col">
-                                        <label>Token Publico</label>
-                                            <input 
-                                                name="publico"
-                                                type="text" 
-                                                className="form-control mb-5" 
-                                                placeholder="Ingresa Token Publico"
-                                                onChange={ handleChange }
-                                                />
-                                    </div>                                    
-                                </div>
-
-                                <div className="row">
-                                    <div className="col">
-                                      <label>Token Privado</label>
-                                        <input 
-                                            name="privado"
-                                            type="text" 
-                                            className="form-control mb-5" 
-                                            placeholder="Ingresa Token Privado"
-                                            onChange={ handleChange }
-                                            />
-                                    </div>                                    
-                                </div> */}
+                                            </div>      
+                                        
                             
                                 <div className="col-md-12">
                                     <textarea
                                         name="codigo"
                                         className="form-control mb-5" 
-                                        placeholder="Ingresa el Codigo aqui"
+                                        placeholder="Ingresa el Payload aqui"
                                         onChange={ handleChange }
                                     />
                                 </div>
