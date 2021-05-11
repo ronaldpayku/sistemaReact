@@ -64,6 +64,7 @@ const Formulario = () => {
         const concat = requestPath + "&" + arrayConcat;
         // console.log(concat)
         const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
+        setResult(sign)
         console.log('firma:', sign)
         console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
     
@@ -133,9 +134,7 @@ const Formulario = () => {
                                             <label>Selecciona el Endpoint</label> 
                                                 <select onChange={ handleChange } 
                                                     name="endpoint" 
-                                                    className="form-control form-control-lg mb-5 mt-2 text-color" 
-                                                    required="required" 
-                                                    data-error="Especifica el endPoint">
+                                                    className="form-control form-control-lg mb-5 mt-2 text-color">
                                                         <option defaultValue selected disabled>Endpoint</option>
                                                         <option value="/api/transaction">transaction</option>
                                                         <option defaultValue="api/verificar/">verificar</option>
@@ -225,9 +224,12 @@ const Formulario = () => {
                                 </div>
                             
                                 <div className="col-md-12">
+                                    <label>Campo de Respuesta </label>
                                         <textarea
+                                            autoFocus={true}
+                                            readOnly
                                             // value={ result }
-                                            className="form-control mb-5" 
+                                            className="form-control x-large-textarea mb-5" 
                                             defaultValue= { result }
                                             name="respuesta"
                                         />
