@@ -1,9 +1,11 @@
+
 import React, { Fragment, useState } from 'react'
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
 
 const Formulario = () => {
+
 
     const handleChange = (e) => {
         
@@ -22,16 +24,21 @@ const Formulario = () => {
         .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
         .catch(res => console.error(res.response)) 
         
-        if(!`${request.publico}`.trim()){
-            console.log('objeto vacio');
-            return
-        }
+        // if(!`${request.publico}`.trim()){
+        //     console.log('objeto vacio');
+        //     return
+        // }
     }
 
     const apiRequest = (method,path,sendData,publicToken,privateToken="",id="") => {
         // console.log(sendData)
+       
+        let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
+       
+        let exampleJson = JSON.parse(dataExample)
       
         let sendDataCopy = '';
+
         if(method === 'post' || method === 'put') {
             try {
 
@@ -40,16 +47,9 @@ const Formulario = () => {
             
             } catch (error) {
 
-                if (error instanceof SyntaxError) {
+                setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)}, \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
 
-                    let mensaje = error.message;
-                    console.log('ERROR EN LA SINTAXIS:', mensaje); 
-
-                } else {
-
-                    throw error;
-                }
-
+                
             }            
         }
 
@@ -80,7 +80,7 @@ const Formulario = () => {
     }
 
    
-    const [request, setRequest] = useState('');
+    const [request, setRequest] = useState({id:''});
     const [result, setResult] = useState('');
     
 
@@ -97,66 +97,101 @@ const Formulario = () => {
                             <div className="title mt-5">
                                 <h2>Sistema Interno Payku</h2>
                             </div>
-                            
-                            <div className="mb-3">
-                                <label className="form-label">Identificador</label>
-                                <input 
-                                    defaultValue
-                                    type="text" 
-                                    className="form-control"
-                                    name="id" 
-                                    placeholder="Ingresa ID a Consultar"
-                                    onChange={ handleChange }
-                                />
-                            </div>
-                            
-                            <div className="col-md-6">
-                                <label>
-                                    Seleciona metodo a Solicitar
-                                    <select onChange={ handleChange } name="method" className="form-select mb-5 mt-2 text-color">
-                                        <option defaultValue selected disabled>Solicitud</option>
-                                        <option value="get">GET</option>
-                                        <option value="post">POST</option>
-                                        <option defaultValue="put">PUT</option>
-                                        <option defaultValue="delete">DELETE</option>
-                                    </select>
-                                </label>
-                            </div>
-                            
+
                             <div className="row">
-                                <div className="col-md-6">
-                                    <label>
-                                    Selecciona Plataforma
+                                    <div className="col-md-6">
+                                        <div className="form-group">
+                                            <label>Identificador</label>
+                                            
+                                                <input
+                                                    type="text" 
+                                                    name="id"
+                                                    className="form-control mb-5 mt-2" 
+                                                    placeholder="Coloca un / antes de ingresar el ID a Consultar"
+                                                    onChange={ handleChange } 
+                                                    
+                                                /> 
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="col-md-6">
+                                        <div className="form-group"> 
+                                            <label>Seleciona metodo a Solicitar</label> 
+                                                <select onChange={ handleChange } 
+                                                name="method" 
+                                                className="form-control form-control-lg mb-5 mt-2 text-color">
+                                                    <option defaultValue selected disabled>Solicitud</option>
+                                                    <option value="get">GET</option>
+                                                    <option value="post">POST</option>
+                                                    <option defaultValue="put">PUT</option>
+                                                    <option defaultValue="delete">DELETE</option>
+                                            </select> 
+                                        </div>
+                                    </div>
+                            </div>
+                                
+                                    <div className="row">
+                                        <div className="col-md-6 ">
+                                            <div className="form-group"> 
+                                                <label>Selecciona Plataforma</label> 
+                                                    <select onChange={ handleChange } 
+                                                        name="url" 
+                                                        className="form-control form-control-lg mb-5 mt-2 text-color">
+                                                            <option defaultValue selected disabled>Url</option>
+                                                            <option value="https://des.payku.cl">Desarrollo</option>
+                                                            <option defaultValue="https://app.payku.cl/">Produccion</option>
+                                                            <option defaultValue="https://devqa.payku.cl/">QA</option>
+                                                    </select> 
+                                            </div>
+                                        </div>
+
+                                    <div className="col-md-6">
+                                        <div className="form-group"> 
+                                        <label>Selecciona el Endpoint</label> 
+                                            <select onChange={ handleChange } 
+                                                name="endpoint" 
+                                                className="form-control form-control-lg mb-5 mt-2 text-color" 
+                                                required="required" 
+                                                data-error="Especifica el endPoint">
+                                                    <option defaultValue selected disabled>Endpoint</option>
+                                                    <option value="/api/transaction">transaction</option>
+                                                    <option defaultValue="api/verificar/">verificar</option>
+                                                    <option defaultValue="api/maclient/">maClient</option>
+                                                    <option defaultValue="api/maaffiliation/">maAffiliation</option>
+                                                    <option value="/api/suclient/">suClient</option>
+                                                    <option defaultValue="api/suclient/customers/">suClient/customers</option>
+                                                    <option defaultValue="api/sususcription/">suSuscription</option>
+                                                    <option defaultValue="api/sutransaction/">suTransaction</option>
+                                                    <option defaultValue="api/suinscriptionscards/">suInscriptionscards</option>
+                                                    <option defaultValue="api/suplan/">suPlan</option>
+                                                    <option defaultValue="api/suplan/plans/">suPlan/plans</option>
+                                                    <option defaultValue="urlnotifysuscription/">urlNotifySuscription</option>
+                                                    <option defaultValue="urlnotifypayment/">urlNotifyPayment</option>
+                                                    <option defaultValue="api/event/">event</option>
+                                                </select> 
+                                            </div>
+                                    </div>
+                                </div>      
+
+                                    {/* <label className="form-label">
+                                        Seleciona Plataforma
                                         <select onChange={ handleChange } name="url" className="form-select mb-5 mt-2 text-color">
                                             <option defaultValue selected disabled>Url</option>
-                                            <option value="https://des.payku.cl/">Desarrollo</option>
+                                            <option value="https://des.payku.cl">Desarrollo</option>
                                             <option defaultValue="https://app.payku.cl/">Produccion</option>
                                             <option defaultValue="https://devqa.payku.cl/">QA</option>
                                         </select>
-                                    </label>
-                                </div>
-                            
-                                <div className="col-md-6">
-                                    {/* <label>
-                                        Escribe el Endpoint
-                                        <input
-                                            className="mt-2"
-                                            type="text"
-                                            name="endpoint"
-                                            placeholder="Ingresa endpoint"
-                                            onChange={ handleChange }
-                                            />
                                     </label> */}
-                            
-                                    <label>
+
+                                    {/* <label className="form-label">
                                         Selecciona el Endpoint
-                                        <select className="form-select mb-5 mt-2 text-color" onChange={ handleChange } name="endpoint">
-                                            <option defaultValue selected disabled>Endpoint</option>
-                                            <option value="api/transaction/">transaction</option>
+                                        <select onChange={ handleChange } name="endpoint" className="form-select mb-5 mt-2 text-color">
+                                        <option defaultValue selected disabled>Endpoint</option>
+                                            <option value="/api/transaction">transaction</option>
                                             <option defaultValue="api/verificar/">verificar</option>
                                             <option defaultValue="api/maclient/">maClient</option>
                                             <option defaultValue="api/maaffiliation/">maAffiliation</option>
-                                            <option value="/api/suclient">suClient</option>
+                                            <option value="/api/suclient/">suClient</option>
                                             <option defaultValue="api/suclient/customers/">suClient/customers</option>
                                             <option defaultValue="api/sususcription/">suSuscription</option>
                                             <option defaultValue="api/sutransaction/">suTransaction</option>
@@ -166,39 +201,78 @@ const Formulario = () => {
                                             <option defaultValue="urlnotifysuscription/">urlNotifySuscription</option>
                                             <option defaultValue="urlnotifypayment/">urlNotifyPayment</option>
                                             <option defaultValue="api/event/">event</option>
-                                        </select>                                    
-                                    </label>
+                                        </select>
+                                    </label> */}
+
+                                    {/* <div className="col">
+                                        <label className="form-label">Selecciona el Endpoint</label>
+                                            <input                                        
+                                                type="text" 
+                                                className="form-control mb-5"
+                                                name="id" 
+                                                placeholder="Ingresa el EndPonit"
+                                                onChange={ handleChange }
+                                            />
+                                    </div>                             */}
+                          
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group"> 
+                                                <label>Token Publico</label> 
+                                                    <input 
+                                                        type="text" 
+                                                        name="publico" 
+                                                        className="form-control" 
+                                                        placeholder="Ingresa Token Publico" 
+                                                        onChange={ handleChange }
+                                                    /> 
+                                            </div>
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <div className="form-group"> 
+                                                <label>Token Privado</label> 
+                                                    <input 
+                                                        type="text" 
+                                                        name="privado" 
+                                                        className="form-control mb-5" 
+                                                        placeholder="Ingresa Token Privado"
+                                                        onChange={ handleChange }
+                                                    /> 
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                {/* <div className="row">
+                                    <div className="col">
+                                        <label>Token Publico</label>
+                                            <input 
+                                                name="publico"
+                                                type="text" 
+                                                className="form-control mb-5" 
+                                                placeholder="Ingresa Token Publico"
+                                                onChange={ handleChange }
+                                                />
+                                    </div>                                    
                                 </div>
-                            
-                                <div className="col-md-6">                                        
-                                    <label>Token Publico</label>
-                                        <input
-                                            className="mt-1"
-                                            type="text"
-                                            name="publico"
-                                            placeholder="Ingresa Token Publico"
-                                            onChange={ handleChange }
-                                        />
-                                    
-                                </div>
-                            
-                                <div className="col-md-6">
-                                        {/* { errorLabel ? <span className="text-danger">{errorLabel}</span> : null } */}
-                                    <label>
-                                        Token Privado
-                                        <input
-                                            className="mt-2"
-                                            type="text"
+
+                                <div className="row">
+                                    <div className="col">
+                                      <label>Token Privado</label>
+                                        <input 
                                             name="privado"
+                                            type="text" 
+                                            className="form-control mb-5" 
                                             placeholder="Ingresa Token Privado"
                                             onChange={ handleChange }
                                             />
-                                    </label>
-                                </div>
+                                    </div>                                    
+                                </div> */}
                             
                                 <div className="col-md-12">
                                     <textarea
                                         name="codigo"
+                                        className="form-control mb-5" 
                                         placeholder="Ingresa el Codigo aqui"
                                         onChange={ handleChange }
                                     />
@@ -207,6 +281,7 @@ const Formulario = () => {
                                 <div className="col-md-12">
                                         <textarea
                                             // value={ result }
+                                            className="form-control mb-5" 
                                             defaultValue= { result }
                                             name="respuesta"
                                         />
@@ -218,7 +293,7 @@ const Formulario = () => {
                                     </div>
                                 </div>
 
-                            </div>
+                           
                         </form>
                     </div>
                 </div>
@@ -231,24 +306,24 @@ export default Formulario
 
 
 
- // datos a enviar sign
-    // {
-    //     "email": "support@youwebsite.cl",
-    //     "name": "Joe Doe",
-    //     "phone": "923122312",
-    //     "address": "Moneda 101",
-    //     "country": "Chile",
-    //     "region": "Metropolitana",
-    //     "city": "Santiago",
-    //     "postal_code": "850000"
-    // }
-    //  registrar datos
-    // {
-    //     "email": "support@youwebsite.cl",
-    //     "order": 98745,
-    //     "subject": "test subject",
-    //     "amount": 25000,
-    //     "payment": 1,
-    //     "urlreturn": "https://youwebsite.com/urlreturn?orderClient=123",
-    //     "urlnotify": "https://youwebsite.com/urlnotify?orderClient=123"
-    // }
+//  // datos a enviar sign
+//     // {
+//     //     "email": "support@youwebsite.cl",
+//     //     "name": "Joe Doe",
+//     //     "phone": "923122312",
+//     //     "address": "Moneda 101",
+//     //     "country": "Chile",
+//     //     "region": "Metropolitana",
+//     //     "city": "Santiago",
+//     //     "postal_code": "850000"
+//     // }
+//     //  registrar datos
+//     // {
+//     //     "email": "support@youwebsite.cl",
+//     //     "order": 98745,
+//     //     "subject": "test subject",
+//     //     "amount": 25000,
+//     //     "payment": 1,
+//     //     "urlreturn": "https://youwebsite.com/urlreturn?orderClient=123",
+//     //     "urlnotify": "https://youwebsite.com/urlnotify?orderClient=123"
+//     // }
