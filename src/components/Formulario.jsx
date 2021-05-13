@@ -4,7 +4,79 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
 
-const Formulario = () => {
+const Formulario = (props) => {
+
+
+    const [request, setRequest] = useState({id:''});
+    const [result, setResult] = useState('');
+    const [active, setActive] = useState(0);
+    const [filtered, setFiltered] = useState([]);
+    const [isShow, setIsShow] = useState(false);
+    const [input, setInput] = useState("");
+
+      
+    
+  
+    const click = e => {
+      setActive(0);
+      setFiltered([]);
+      setIsShow(false);
+      setInput(e.currentTarget.innerText)
+    };
+  
+    const onKeyDown = e => {
+  
+        if (e.keyCode === 13) { // enter key
+        setActive(0);
+        setIsShow(false);
+        setInput(filtered[active])
+      }
+  
+      else if (e.keyCode === 38) { // flecha arriba
+        return (active === 0) ? null : setActive(active - 1);
+      }
+  
+      else if (e.keyCode === 40) { // flecha abajo
+        return (active - 1 === filtered.length) ? null : setActive(active + 1);
+      }
+    };
+  
+    const renderAutocomplete = () => {
+      if (isShow && input) {
+        if (filtered.length) {
+          return (
+            <ul className="autocomplete">
+              {filtered.map((suggestion, index) => {
+                let className;
+                if (index === active) {
+                  className = "active";
+                }
+                return (
+                  <li className={className} key={suggestion} onClick={click}>
+                    {suggestion}
+                  </li>
+                );
+              })}
+            </ul>
+          );
+
+        } 
+        else {
+          return (
+            <div className="no-autocomplete mb-4">
+              El EndPoint Seleccionado no coincide con ninguna busqueda
+            </div>
+          );
+        }
+      }
+      return <></>;
+    }
+
+
+
+
+
+    // fin pruebas autocomplete
 
 
     const handleChange = (e) => {
@@ -13,6 +85,18 @@ const Formulario = () => {
           ...request,
           [e.target.name]: e.target.value,
         });
+
+        const { suggestions } = props;
+        const input = e.currentTarget.value;
+        const newFilteredSuggestions = suggestions.filter(
+          suggestion =>
+            suggestion.toLowerCase().indexOf(input.toLowerCase()) > -1
+        );
+  
+        setActive(0);
+        setFiltered(newFilteredSuggestions);
+        setIsShow(true);
+        setInput(e.currentTarget.value)
        
     };
 
@@ -52,40 +136,73 @@ const Formulario = () => {
                 
             }            
         }
-
-              
+        
         const requestPath = encodeURIComponent(`${request.endpoint}`);
         const orderedData = {};
         Object.keys(sendDataCopy).sort().forEach(function(key) {
             orderedData[key] = sendDataCopy[key];
         })
-      
+        
         const arrayConcat = new URLSearchParams(orderedData).toString()
         const concat = requestPath + "&" + arrayConcat;
         // console.log(concat)
         const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
-        setResult(sign)
+        // setResult(sign)
         console.log('firma:', sign)
         console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
+                
+    
     
         return axios({
-          method: `${method}`,
-          url: `${request.url}${path}${id}`,
-          data: sendDataCopy,
-          headers: {
+            method: `${method}`,
+            url: `${request.url}${path}${id}`,
+            data: sendDataCopy,
+            headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${publicToken}`,
             'Sign': sign,  
-          }
+            }
         })
+
+        
+        // if (method === 'post' && request.endpoint === '/api/suclient/') {
+
+        //     const requestPath = encodeURIComponent(`${request.endpoint}`);
+        //     const orderedData = {};
+        //     Object.keys(sendDataCopy).sort().forEach(function(key) {
+        //         orderedData[key] = sendDataCopy[key];
+        //     })
+          
+        //     const arrayConcat = new URLSearchParams(orderedData).toString()
+        //     const concat = requestPath + "&" + arrayConcat;
+        //     // console.log(concat)
+        //     const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
+        //     // setResult(sign)
+        //     console.log('firma:', sign)
+        //     console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
+                  
+        
+        // } else {
+        //     return axios({
+        //       method: `${method}`,
+        //       url: `${request.url}${path}${id}`,
+        //       data: sendDataCopy,
+        //       headers: {
+        //         'Content-Type': 'application/json',
+        //         Authorization: `Bearer ${publicToken}`,
+        //         'Sign': sign,  
+        //       }
+        //     })
+
+        // }
     }
 
    
-    const [request, setRequest] = useState({id:''});
-    const [result, setResult] = useState('');
     
 
     
+
+        
     
     
     return (
@@ -128,45 +245,59 @@ const Formulario = () => {
                                             </select> 
                                         </div>
                                     </div>
+
                                 
-                                    <div className="col-md-4">
+                                    {/* <div className="col-md-4">
                                         <div className="form-group"> 
-                                            <label>Selecciona el Endpoint</label> 
-                                                <select onChange={ handleChange } 
-                                                    name="endpoint" 
-                                                    className="form-control form-control-lg mb-5 mt-2 text-color">
-                                                        <option defaultValue selected disabled>Endpoint</option>
-                                                        <option value="/api/transaction">transaction</option>
-                                                        <option defaultValue="api/verificar/">verificar</option>
-                                                        <option defaultValue="api/maclient/">maClient</option>
-                                                        <option defaultValue="api/maaffiliation/">maAffiliation</option>
-                                                        <option value="/api/suclient/">suClient</option>
-                                                        <option defaultValue="api/suclient/customers/">suClient/customers</option>
-                                                        <option defaultValue="api/sususcription/">suSuscription</option>
-                                                        <option defaultValue="api/sutransaction/">suTransaction</option>
-                                                        <option defaultValue="api/suinscriptionscards/">suInscriptionscards</option>
-                                                        <option defaultValue="api/suplan/">suPlan</option>
-                                                        <option defaultValue="api/suplan/plans/">suPlan/plans</option>
-                                                        <option defaultValue="urlnotifysuscription/">urlNotifySuscription</option>
-                                                        <option defaultValue="urlnotifypayment/">urlNotifyPayment</option>
-                                                        <option defaultValue="api/event/">event</option>
-                                                </select> 
+                                        <label>Selecciona el Endpoint</label> 
+                                        <select onChange={ handleChange } 
+                                        name="endpoint" 
+                                        className="form-control form-control-lg mb-5 mt-2 text-color">
+                                        <option defaultValue selected disabled>Endpoint</option>
+                                        <option value="/api/transaction">transaction</option>
+                                        <option defaultValue="api/verificar/">verificar</option>
+                                        <option defaultValue="api/maclient/">maClient</option>
+                                        <option defaultValue="api/maaffiliation/">maAffiliation</option>
+                                        <option value="/api/suclient/">suClient</option>
+                                        <option defaultValue="api/suclient/customers/">suClient/customers</option>
+                                        <option defaultValue="api/sususcription/">suSuscription</option>
+                                        <option defaultValue="api/sutransaction/">suTransaction</option>
+                                        <option defaultValue="api/suinscriptionscards/">suInscriptionscards</option>
+                                        <option defaultValue="api/suplan/">suPlan</option>
+                                        <option defaultValue="api/suplan/plans/">suPlan/plans</option>
+                                        <option defaultValue="urlnotifysuscription/">urlNotifySuscription</option>
+                                        <option defaultValue="urlnotifypayment/">urlNotifyPayment</option>
+                                        <option defaultValue="api/event/">event</option>
+                                        </select> 
                                         </div>
-                                    </div>
+                                    </div> */}
+                                    {/* <>
+                                        <input
+                                            type="text"
+                                            name="endpoint"
+                                            onChange={ handleChange }
+                                            onKeyDown={onKeyDown}
+                                            value={input}
+                                        />
+                                        {renderAutocomplete()}
+                                    </> */}
 
                                     {/* Cuadro de texto del endpoint */}
-                                        {/* <div className="col-md-4">
+                                        <div className="col-md-4">
                                             <div className="form-group">
                                                 <label>Escribe el EndPoint</label>
                                                     <input
                                                         type="text" 
                                                         name="endpoint"
-                                                        className="form-control mb-5 mt-2 text-color" 
+                                                        className="form-control mt-2 text-color" 
                                                         placeholder="EndPoint"
-                                                        onChange={ handleChange } 
+                                                        onChange={ handleChange }
+                                                        onKeyDown={ onKeyDown }
+                                                        // value={ input } 
                                                     /> 
+                                                    {renderAutocomplete()}
                                             </div>
-                                        </div> */}
+                                        </div>
 
                                 </div>
                                    
@@ -213,6 +344,7 @@ const Formulario = () => {
                                             </div>
                                             </div>      
                                         
+                                       
                             
                                 <div className="col-md-12">
                                     <textarea
@@ -246,6 +378,10 @@ const Formulario = () => {
                     </div>
                 </div>
             </div>
+
+
+
+            
         </Fragment>
     )
 }
@@ -275,3 +411,5 @@ export default Formulario
 //     //     "urlreturn": "https://youwebsite.com/urlreturn?orderClient=123",
 //     //     "urlnotify": "https://youwebsite.com/urlnotify?orderClient=123"
 //     // }
+
+                                                        
