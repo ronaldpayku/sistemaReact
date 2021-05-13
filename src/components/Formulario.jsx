@@ -1,4 +1,3 @@
-
 import React, { Fragment, useState } from 'react'
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
@@ -13,15 +12,21 @@ const Formulario = (props) => {
     const [filtered, setFiltered] = useState([]);
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
-
+    const [firma, setFirma] = useState('')
+ 
       
     
   
     const click = e => {
       setActive(0);
+      const apiendpoint = e.currentTarget.innerText;
+      setRequest({
+          ...request,
+          endpoint:apiendpoint
+      })
       setFiltered([]);
       setIsShow(false);
-      setInput(e.currentTarget.innerText)
+      setInput(apiendpoint)
     };
   
     const onKeyDown = e => {
@@ -46,11 +51,13 @@ const Formulario = (props) => {
         if (filtered.length) {
           return (
             <ul className="autocomplete">
-              {filtered.map((suggestion, index) => {
+              { filtered.map (( suggestion, index ) => {
+                
                 let className;
                 if (index === active) {
                   className = "active";
                 }
+                
                 return (
                   <li className={className} key={suggestion} onClick={click}>
                     {suggestion}
@@ -60,8 +67,7 @@ const Formulario = (props) => {
             </ul>
           );
 
-        } 
-        else {
+        } else {
           return (
             <div className="no-autocomplete mb-4">
               El EndPoint Seleccionado no coincide con ninguna busqueda
@@ -92,7 +98,7 @@ const Formulario = (props) => {
           suggestion =>
             suggestion.toLowerCase().indexOf(input.toLowerCase()) > -1
         );
-  
+        console.log("este es el input", input)
         setActive(0);
         setFiltered(newFilteredSuggestions);
         setIsShow(true);
@@ -150,7 +156,7 @@ const Formulario = (props) => {
         // setResult(sign)
         console.log('firma:', sign)
         console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
-                
+        setFirma(sign)
     
     
         return axios({
@@ -211,7 +217,6 @@ const Formulario = (props) => {
                 <div className="row">
                     <div className="col-md-8 offset-md-2">
                         <form className="form" >
-                        
                             <div className="title mt-5">
                                 <h2>Sistema Interno Payku</h2>
                             </div>
@@ -225,8 +230,8 @@ const Formulario = (props) => {
                                                     className="form-control form-control-lg mb-5 mt-2 text-color">
                                                         <option defaultValue selected disabled>Url</option>
                                                         <option value="https://des.payku.cl">Desarrollo</option>
-                                                        <option defaultValue="https://app.payku.cl/">Produccion</option>
-                                                        <option defaultValue="https://devqa.payku.cl/">QA</option>
+                                                        <option value="https://app.payku.cl/">Produccion</option>
+                                                        <option value="https://devqa.payku.cl/">QA</option>
                                                 </select> 
                                         </div>
                                     </div>
@@ -271,18 +276,10 @@ const Formulario = (props) => {
                                         </select> 
                                         </div>
                                     </div> */}
-                                    {/* <>
-                                        <input
-                                            type="text"
-                                            name="endpoint"
-                                            onChange={ handleChange }
-                                            onKeyDown={onKeyDown}
-                                            value={input}
-                                        />
-                                        {renderAutocomplete()}
-                                    </> */}
+                                    
 
                                     {/* Cuadro de texto del endpoint */}
+                                    
                                         <div className="col-md-4">
                                             <div className="form-group">
                                                 <label>Escribe el EndPoint</label>
@@ -293,11 +290,12 @@ const Formulario = (props) => {
                                                         placeholder="EndPoint"
                                                         onChange={ handleChange }
                                                         onKeyDown={ onKeyDown }
-                                                        // value={ input } 
-                                                    /> 
+                                                        value={ request.endpoint } 
+                                                        /> 
                                                     {renderAutocomplete()}
                                             </div>
                                         </div>
+                                    
 
                                 </div>
                                    
@@ -313,7 +311,7 @@ const Formulario = (props) => {
                                                         placeholder="Coloca un / antes de ingresar el ID a Consultar"
                                                         onChange={ handleChange } 
                                                         
-                                                    /> 
+                                                        /> 
                                             </div>
                                         </div>
                                     
@@ -339,10 +337,10 @@ const Formulario = (props) => {
                                                         className="form-control mb-5" 
                                                         placeholder="Ingresa Token Privado"
                                                         onChange={ handleChange }
-                                                        /> 
+                                                    /> 
                                             </div>
-                                            </div>
-                                            </div>      
+                                        </div>
+                                    </div>      
                                         
                                        
                             
@@ -352,15 +350,15 @@ const Formulario = (props) => {
                                         className="form-control mb-5" 
                                         placeholder="Ingresa el Payload aqui"
                                         onChange={ handleChange }
-                                    />
+                                        />
                                 </div>
+                                    <label >Este es el Path Generado<p>{request.url}{request.endpoint}{request.id}</p></label>
                             
                                 <div className="col-md-12">
                                     <label>Campo de Respuesta </label>
                                         <textarea
                                             autoFocus={true}
                                             readOnly
-                                            // value={ result }
                                             className="form-control x-large-textarea mb-5" 
                                             defaultValue= { result }
                                             name="respuesta"
@@ -378,9 +376,6 @@ const Formulario = (props) => {
                     </div>
                 </div>
             </div>
-
-
-
             
         </Fragment>
     )

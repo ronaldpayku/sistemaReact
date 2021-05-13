@@ -13,7 +13,7 @@ function App() {
           "api/maaffiliation/",
           "/api/suclient/", 
           "api/suclient/customers/", 
-          "api/sususcription/", 
+          "/api/sususcription/", 
           "api/sutransaction/", 
           "api/suinscriptionscards/", 
           "api/suplan/",
