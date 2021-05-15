@@ -2,6 +2,10 @@ import React, { Fragment, useState } from 'react'
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
+import ReCAPTCHA from "react-google-recaptcha";
+
+
+
 
 const Formulario = (props) => {
 
@@ -12,10 +16,30 @@ const Formulario = (props) => {
     const [filtered, setFiltered] = useState([]);
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
-    const [firma, setFirma] = useState('')
- 
-      
-    
+
+    const [error, setError] = useState("")
+    const [token, setToken] = useState("")
+    const [submit, setSubmit] = useState(false)
+
+    // Función que se ejecutará después de recibir el token.
+    const callback = () => {
+        console.log("Done!!!!")
+    }
+     
+    // Recibimos el token y almacenamos su respuesta en un estado con el hook useState.
+    const verifyCallback = (response) => {
+    setToken(response)
+  }
+
+
+    const sign = ""
+
+    const recaptchaRef = React.createRef();
+
+    const onSubmit = () => {
+        const recaptchaValue = recaptchaRef.current.getValue();
+        this.props.onSubmit(recaptchaValue);
+      }
   
     const click = e => {
       setActive(0);
@@ -30,24 +54,26 @@ const Formulario = (props) => {
     };
   
     const onKeyDown = e => {
-  
+        
+        
         if (e.keyCode === 13) { // enter key
-        setActive(0);
-        setIsShow(false);
-        setInput(filtered[active])
-      }
+
+            setActive(0);
+            setIsShow(false);
+            setInput(filtered[active])
+        }
   
-      else if (e.keyCode === 38) { // flecha arriba
-        return (active === 0) ? null : setActive(active - 1);
-      }
+        else if (e.keyCode === 38) { // flecha arriba
+          return (active === 0) ? null : setActive(active - 1);
+        }
   
-      else if (e.keyCode === 40) { // flecha abajo
-        return (active - 1 === filtered.length) ? null : setActive(active + 1);
-      }
+        else if (e.keyCode === 40) { // flecha abajo
+            return (active - 1 === filtered.length) ? null : setActive(active + 1);
+        }
     };
   
     const renderAutocomplete = () => {
-      if (isShow && input) {
+      if (isShow && request.endpoint) {
         if (filtered.length) {
           return (
             <ul className="autocomplete">
@@ -67,25 +93,27 @@ const Formulario = (props) => {
             </ul>
           );
 
-        } else {
+        } 
+        // else {
+        //   return (
+        //     <div className="no-autocomplete mb-4">
+        //       El EndPoint Seleccionado no coincide con ninguna busqueda
+        //     </div>
+        //   );
+        // }
+      }
+        else {
           return (
             <div className="no-autocomplete mb-4">
               El EndPoint Seleccionado no coincide con ninguna busqueda
             </div>
           );
         }
-      }
+
       return <></>;
     }
 
-
-
-
-
-    // fin pruebas autocomplete
-
-
-    const handleChange = (e) => {
+    const handleChange = (e, valor) => {
         
         setRequest({
           ...request,
@@ -98,11 +126,12 @@ const Formulario = (props) => {
           suggestion =>
             suggestion.toLowerCase().indexOf(input.toLowerCase()) > -1
         );
-        console.log("este es el input", input)
+        console.log("este es el input ",input)
         setActive(0);
         setFiltered(newFilteredSuggestions);
         setIsShow(true);
         setInput(e.currentTarget.value)
+        console.log('valor captcha', valor)
        
     };
 
@@ -114,10 +143,6 @@ const Formulario = (props) => {
         .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
         .catch(res => console.error(res.response)) 
         
-        // if(!`${request.publico}`.trim()){
-        //     console.log('objeto vacio');
-        //     return
-        // }
     }
 
     const apiRequest = (method,path,sendData,publicToken,privateToken="",id="") => {
@@ -143,80 +168,57 @@ const Formulario = (props) => {
             }            
         }
         
-        const requestPath = encodeURIComponent(`${request.endpoint}`);
-        const orderedData = {};
-        Object.keys(sendDataCopy).sort().forEach(function(key) {
-            orderedData[key] = sendDataCopy[key];
-        })
-        
-        const arrayConcat = new URLSearchParams(orderedData).toString()
-        const concat = requestPath + "&" + arrayConcat;
-        // console.log(concat)
-        const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
-        // setResult(sign)
-        console.log('firma:', sign)
-        console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
-        setFirma(sign)
-    
-    
-        return axios({
-            method: `${method}`,
-            url: `${request.url}${path}${id}`,
-            data: sendDataCopy,
-            headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${publicToken}`,
-            'Sign': sign,  
-            }
-        })
+               
+        if (`${request.endpoint}` === '/api/suclient/') {
 
-        
-        // if (method === 'post' && request.endpoint === '/api/suclient/') {
-
-        //     const requestPath = encodeURIComponent(`${request.endpoint}`);
-        //     const orderedData = {};
-        //     Object.keys(sendDataCopy).sort().forEach(function(key) {
-        //         orderedData[key] = sendDataCopy[key];
-        //     })
+            const requestPath = encodeURIComponent(`${request.endpoint}`);
+            const orderedData = {};
+            Object.keys(sendDataCopy).sort().forEach(function(key) {
+                orderedData[key] = sendDataCopy[key];
+            })
           
-        //     const arrayConcat = new URLSearchParams(orderedData).toString()
-        //     const concat = requestPath + "&" + arrayConcat;
-        //     // console.log(concat)
-        //     const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
-        //     // setResult(sign)
-        //     console.log('firma:', sign)
-        //     console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
-                  
+            const arrayConcat = new URLSearchParams(orderedData).toString()
+            const concat = requestPath + "&" + arrayConcat;
+            // console.log(concat)
+            const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
+            // setResult(sign)
+            console.log('firma:', sign)
+            console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
+            setSubmit("enviado con exito", sign)
+            
+            return axios({
+                method: `${method}`,
+                url: `${request.url}${path}${id}`,
+                data: sendDataCopy,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${publicToken}`,
+                    'Sign': sign,  
+                }
+            })
         
-        // } else {
-        //     return axios({
-        //       method: `${method}`,
-        //       url: `${request.url}${path}${id}`,
-        //       data: sendDataCopy,
-        //       headers: {
-        //         'Content-Type': 'application/json',
-        //         Authorization: `Bearer ${publicToken}`,
-        //         'Sign': sign,  
-        //       }
-        //     })
+        } 
+        else {
+            return axios({
+              method: `${method}`,
+              url: `${request.url}${path}${id}`,
+              data: sendDataCopy,
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${publicToken}`,
+                'Sign': sign,  
+              }
+            })
 
-        // }
+        }
     }
-
-   
-    
-
-    
-
-        
-    
     
     return (
         <Fragment>
             <div className="container">
                 <div className="row">
                     <div className="col-md-8 offset-md-2">
-                        <form className="form" >
+                        <form onSubmit={onSubmit} className="form" >
                             <div className="title mt-5">
                                 <h2>Sistema Interno Payku</h2>
                             </div>
@@ -245,38 +247,11 @@ const Formulario = (props) => {
                                                     <option defaultValue selected disabled>Solicitud</option>
                                                     <option value="get">GET</option>
                                                     <option value="post">POST</option>
-                                                    <option defaultValue="put">PUT</option>
-                                                    <option defaultValue="delete">DELETE</option>
+                                                    <option value="put">PUT</option>
+                                                    <option value="delete">DELETE</option>
                                             </select> 
                                         </div>
                                     </div>
-
-                                
-                                    {/* <div className="col-md-4">
-                                        <div className="form-group"> 
-                                        <label>Selecciona el Endpoint</label> 
-                                        <select onChange={ handleChange } 
-                                        name="endpoint" 
-                                        className="form-control form-control-lg mb-5 mt-2 text-color">
-                                        <option defaultValue selected disabled>Endpoint</option>
-                                        <option value="/api/transaction">transaction</option>
-                                        <option defaultValue="api/verificar/">verificar</option>
-                                        <option defaultValue="api/maclient/">maClient</option>
-                                        <option defaultValue="api/maaffiliation/">maAffiliation</option>
-                                        <option value="/api/suclient/">suClient</option>
-                                        <option defaultValue="api/suclient/customers/">suClient/customers</option>
-                                        <option defaultValue="api/sususcription/">suSuscription</option>
-                                        <option defaultValue="api/sutransaction/">suTransaction</option>
-                                        <option defaultValue="api/suinscriptionscards/">suInscriptionscards</option>
-                                        <option defaultValue="api/suplan/">suPlan</option>
-                                        <option defaultValue="api/suplan/plans/">suPlan/plans</option>
-                                        <option defaultValue="urlnotifysuscription/">urlNotifySuscription</option>
-                                        <option defaultValue="urlnotifypayment/">urlNotifyPayment</option>
-                                        <option defaultValue="api/event/">event</option>
-                                        </select> 
-                                        </div>
-                                    </div> */}
-                                    
 
                                     {/* Cuadro de texto del endpoint */}
                                     
@@ -345,14 +320,15 @@ const Formulario = (props) => {
                                        
                             
                                 <div className="col-md-12">
-                                    <textarea
-                                        name="codigo"
-                                        className="form-control mb-5" 
-                                        placeholder="Ingresa el Payload aqui"
-                                        onChange={ handleChange }
+                                    <label>Ingreso de Datos </label>
+                                        <textarea
+                                            name="codigo"
+                                            className="form-control mb-5" 
+                                            placeholder="Ingresa el Payload aqui"
+                                            onChange={ handleChange }
                                         />
                                 </div>
-                                    <label >Este es el Path Generado<p>{request.url}{request.endpoint}{request.id}</p></label>
+                                    <label>Este es el Path Generado<p>{request.url}{request.endpoint}{request.id}{sign}{request.sign}</p></label>
                             
                                 <div className="col-md-12">
                                     <label>Campo de Respuesta </label>
@@ -366,6 +342,17 @@ const Formulario = (props) => {
                                 </div>
                             
                                 <div className="col-md-12">
+                                    
+                                    <ReCAPTCHA 
+                                        ref={recaptchaRef}
+                                        sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
+                                        render="explicit"
+                                        verifyCallback={verifyCallback}
+                                        onloadCallback={callback}
+                                        // onClick={ handleSubmit }
+                                    />
+                                    {submit && <div className="alert success">{submit}</div>}
+                                    {error && <div className="alert error">{error}</div>}
                                     <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
                                         <button className="me-md-2" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
                                     </div>
