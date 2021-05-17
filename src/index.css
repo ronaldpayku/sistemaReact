@@ -91,3 +91,9 @@ input {
 .autocomplete li:not(:last-of-type) {
   border-bottom: 1px solid #999;
 }
+
+/* captcha */
+.error-captcha {
+	color: red;
+	margin-bottom: 20px;
+}

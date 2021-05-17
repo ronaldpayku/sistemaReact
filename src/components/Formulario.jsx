@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useState, useRef } from 'react'
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
@@ -17,52 +17,32 @@ const Formulario = (props) => {
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
 
-    const [error, setError] = useState("")
-    const [token, setToken] = useState("")
-    const [submit, setSubmit] = useState(false)
-
-    // Función que se ejecutará después de recibir el token.
-    const callback = () => {
-        console.log("Done!!!!")
-    }
-     
-    // Recibimos el token y almacenamos su respuesta en un estado con el hook useState.
-    const verifyCallback = (response) => {
-    setToken(response)
-  }
-
 
     const sign = ""
 
-    const recaptchaRef = React.createRef();
-
-    const onSubmit = () => {
-        const recaptchaValue = recaptchaRef.current.getValue();
-        this.props.onSubmit(recaptchaValue);
-      }
   
     const click = e => {
-      setActive(0);
-      const apiendpoint = e.currentTarget.innerText;
-      setRequest({
-          ...request,
-          endpoint:apiendpoint
-      })
-      setFiltered([]);
-      setIsShow(false);
-      setInput(apiendpoint)
+        setActive(0);
+        const apiendpoint = e.currentTarget.innerText;
+        setRequest({
+            ...request,
+            endpoint:apiendpoint
+        })
+        setFiltered([]);
+        setIsShow(false);
+        setInput(apiendpoint)
     };
-  
+    
     const onKeyDown = e => {
         
         
         if (e.keyCode === 13) { // enter key
-
+            
             setActive(0);
             setIsShow(false);
             setInput(filtered[active])
         }
-  
+        
         else if (e.keyCode === 38) { // flecha arriba
           return (active === 0) ? null : setActive(active - 1);
         }
@@ -71,16 +51,16 @@ const Formulario = (props) => {
             return (active - 1 === filtered.length) ? null : setActive(active + 1);
         }
     };
-  
+    
     const renderAutocomplete = () => {
-      if (isShow && request.endpoint) {
+        if (isShow && request.endpoint) {
         if (filtered.length) {
-          return (
+            return (
             <ul className="autocomplete">
               { filtered.map (( suggestion, index ) => {
-                
-                let className;
-                if (index === active) {
+                  
+                  let className;
+                  if (index === active) {
                   className = "active";
                 }
                 
@@ -95,53 +75,81 @@ const Formulario = (props) => {
 
         } 
         // else {
-        //   return (
+            //   return (
         //     <div className="no-autocomplete mb-4">
         //       El EndPoint Seleccionado no coincide con ninguna busqueda
         //     </div>
         //   );
         // }
-      }
-        else {
-          return (
+    }
+    else {
+        return (
             <div className="no-autocomplete mb-4">
               El EndPoint Seleccionado no coincide con ninguna busqueda
             </div>
           );
         }
-
-      return <></>;
+        
+        return <></>;
     }
+    
+    //probando captcha
+    const captcha = useRef(null)
+    // const firma = useRef(null)
 
-    const handleChange = (e, valor) => {
+    const [captchaValido, setCaptchaValido] = useState(null)
+    // const [firmaValido, setFirmaValido] = useState(null)
+    
+    // funcion captcha
+    // const onChange = () => {
+
+    //     if (captcha.current.getValue()) {
+    //         console.log('no es un robot');
+    //         setCaptchaValido(true)
+    //     }
+    // }
+
+        
+    const handleChange = (e) => {
+        
         
         setRequest({
           ...request,
           [e.target.name]: e.target.value,
         });
-
+        
         const { suggestions } = props;
         const input = e.currentTarget.value;
         const newFilteredSuggestions = suggestions.filter(
-          suggestion =>
+            suggestion =>
             suggestion.toLowerCase().indexOf(input.toLowerCase()) > -1
-        );
-        console.log("este es el input ",input)
-        setActive(0);
+            );
+            console.log("este es el input ",input)
+            setActive(0);
         setFiltered(newFilteredSuggestions);
         setIsShow(true);
         setInput(e.currentTarget.value)
-        console.log('valor captcha', valor)
-       
+
+        
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();  
-      
-        console.log('entrando handleSubmit')
-        apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
-        .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
-        .catch(res => console.error(res.response)) 
+       
+        //probando captcha
+        if (captcha.current.getValue()) {
+
+            console.log('no es un robot');
+            console.log('entrando handleSubmit')
+            apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
+            .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
+            .catch(res => console.error(res.response))
+            setCaptchaValido(true)
+        } else {
+
+            console.log('robot')
+            setCaptchaValido(false)
+        }
         
     }
 
@@ -182,9 +190,13 @@ const Formulario = (props) => {
             // console.log(concat)
             const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
             // setResult(sign)
+            // if (sign.current.getValue()) {
+            //     console.log('esta es la firma', sign);
+            //     setFirmaValido(true)
+            // }
             console.log('firma:', sign)
             console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
-            setSubmit("enviado con exito", sign)
+            // setSubmit("enviado con exito", sign)
             
             return axios({
                 method: `${method}`,
@@ -218,7 +230,7 @@ const Formulario = (props) => {
             <div className="container">
                 <div className="row">
                     <div className="col-md-8 offset-md-2">
-                        <form onSubmit={onSubmit} className="form" >
+                        <form className="form" onSubmit={handleSubmit}>
                             <div className="title mt-5">
                                 <h2>Sistema Interno Payku</h2>
                             </div>
@@ -316,8 +328,9 @@ const Formulario = (props) => {
                                             </div>
                                         </div>
                                     </div>      
+                                    
+                                    
                                         
-                                       
                             
                                 <div className="col-md-12">
                                     <label>Ingreso de Datos </label>
@@ -343,16 +356,15 @@ const Formulario = (props) => {
                             
                                 <div className="col-md-12">
                                     
-                                    <ReCAPTCHA 
-                                        ref={recaptchaRef}
-                                        sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
-                                        render="explicit"
-                                        verifyCallback={verifyCallback}
-                                        onloadCallback={callback}
-                                        // onClick={ handleSubmit }
-                                    />
-                                    {submit && <div className="alert success">{submit}</div>}
-                                    {error && <div className="alert error">{error}</div>}
+                                     <div className="recaptcha">
+                                        <ReCAPTCHA 
+                                            ref = {captcha}
+                                            sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
+                                            onChange={ handleSubmit }
+                                        />    
+                                    </div>   
+                                    { captchaValido === false && <div className="error-captcha">Por favor acepta el captcha</div>}                                         
+                                    
                                     <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
                                         <button className="me-md-2" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
                                     </div>
