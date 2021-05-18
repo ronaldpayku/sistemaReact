@@ -17,101 +17,15 @@ const Formulario = (props) => {
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
 
-
-    const sign = ""
-
-  
-    const click = e => {
-        setActive(0);
-        const apiendpoint = e.currentTarget.innerText;
-        setRequest({
-            ...request,
-            endpoint:apiendpoint
-        })
-        setFiltered([]);
-        setIsShow(false);
-        setInput(apiendpoint)
-    };
-    
-    const onKeyDown = e => {
-        
-        
-        if (e.keyCode === 13) { // enter key
-            
-            setActive(0);
-            setIsShow(false);
-            setInput(filtered[active])
-        }
-        
-        else if (e.keyCode === 38) { // flecha arriba
-          return (active === 0) ? null : setActive(active - 1);
-        }
-  
-        else if (e.keyCode === 40) { // flecha abajo
-            return (active - 1 === filtered.length) ? null : setActive(active + 1);
-        }
-    };
-    
-    const renderAutocomplete = () => {
-        if (isShow && request.endpoint) {
-        if (filtered.length) {
-            return (
-            <ul className="autocomplete">
-              { filtered.map (( suggestion, index ) => {
-                  
-                  let className;
-                  if (index === active) {
-                  className = "active";
-                }
-                
-                return (
-                  <li className={className} key={suggestion} onClick={click}>
-                    {suggestion}
-                  </li>
-                );
-              })}
-            </ul>
-          );
-
-        } 
-        // else {
-            //   return (
-        //     <div className="no-autocomplete mb-4">
-        //       El EndPoint Seleccionado no coincide con ninguna busqueda
-        //     </div>
-        //   );
-        // }
-    }
-    else {
-        return (
-            <div className="no-autocomplete mb-4">
-              El EndPoint Seleccionado no coincide con ninguna busqueda
-            </div>
-          );
-        }
-        
-        return <></>;
-    }
-    
     //probando captcha
     const captcha = useRef(null)
-    // const firma = useRef(null)
 
     const [captchaValido, setCaptchaValido] = useState(null)
-    // const [firmaValido, setFirmaValido] = useState(null)
+
+
     
-    // funcion captcha
-    // const onChange = () => {
-
-    //     if (captcha.current.getValue()) {
-    //         console.log('no es un robot');
-    //         setCaptchaValido(true)
-    //     }
-    // }
-
         
     const handleChange = (e) => {
-        
         
         setRequest({
           ...request,
@@ -124,8 +38,8 @@ const Formulario = (props) => {
             suggestion =>
             suggestion.toLowerCase().indexOf(input.toLowerCase()) > -1
             );
-            console.log("este es el input ",input)
-            setActive(0);
+        // console.log("este es el input ",input)
+        setActive(0);
         setFiltered(newFilteredSuggestions);
         setIsShow(true);
         setInput(e.currentTarget.value)
@@ -133,34 +47,39 @@ const Formulario = (props) => {
         
     };
 
+   
     const handleSubmit = (e) => {
         e.preventDefault();  
-       
+        setCaptchaValido(true)
         //probando captcha
+        // console.log('valor captcha handle', captcha.current.getValue() )
+
         if (captcha.current.getValue()) {
 
-            console.log('no es un robot');
-            console.log('entrando handleSubmit')
+            // console.log('no es un robot');
+            // console.log('entrando handleSubmit')
             apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
             .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
             .catch(res => console.error(res.response))
             setCaptchaValido(true)
+
         } else {
 
-            console.log('robot')
+            console.log('acepta el captcha')
             setCaptchaValido(false)
         }
         
     }
 
-    const apiRequest = (method,path,sendData,publicToken,privateToken="",id="") => {
-        // console.log(sendData)
+    const apiRequest = (method,path,sendData,publicToken,privateToken="",id="",sign="") => {
        
         let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
        
         let exampleJson = JSON.parse(dataExample)
       
         let sendDataCopy = '';
+
+        // const sign = '';
 
         if(method === 'post' || method === 'put') {
             try {
@@ -187,16 +106,14 @@ const Formulario = (props) => {
           
             const arrayConcat = new URLSearchParams(orderedData).toString()
             const concat = requestPath + "&" + arrayConcat;
-            // console.log(concat)
             const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
             // setResult(sign)
             // if (sign.current.getValue()) {
             //     console.log('esta es la firma', sign);
             //     setFirmaValido(true)
             // }
-            console.log('firma:', sign)
-            console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
-            // setSubmit("enviado con exito", sign)
+            console.log('firma:', sign, "url", `${request.url}${path}${id}`)
+            // console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
             
             return axios({
                 method: `${method}`,
@@ -223,7 +140,77 @@ const Formulario = (props) => {
             })
 
         }
+        
     }
+
+
+    const click = e => {
+
+        setActive(0);
+        const apiendpoint = e.currentTarget.innerText;
+        setRequest({
+            ...request,
+            endpoint:apiendpoint
+        })
+        setFiltered([]);
+        setIsShow(false);
+        setInput(apiendpoint)
+    };
+    
+    const onKeyDown = e => {
+        
+        if (e.keyCode === 13) { // enter key
+            
+            setActive(0);
+            setIsShow(false);
+            setInput(filtered[active])
+        }
+        
+        else if (e.keyCode === 38) { // flecha arriba
+          return (active === 0) ? null : setActive(active - 1);
+        }
+  
+        else if (e.keyCode === 40) { // flecha abajo
+            return (active - 1 === filtered.length) ? null : setActive(active + 1);
+        }
+    };
+    
+    const renderAutocomplete = () => {
+        if (isShow && input) {
+            if (filtered.length) {
+                return (
+                    <ul className="autocomplete">
+                        { filtered.map (( suggestion, index ) => {
+                            
+                            let className;
+                            if (index === active) {
+                            className = "active";
+                            }
+                            
+                            return (
+                            <li className={className} key={suggestion} onClick={click}>
+                                {suggestion}
+                            </li>
+                            );
+                        })}
+                    </ul>
+                );
+
+            } 
+            // else {
+            //       return (
+            //     <div className="no-autocomplete mb-4">
+            //       El EndPoint Seleccionado no coincide con ninguna busqueda
+            //     </div>
+            //   );
+            // }
+        }
+                    
+            return <></>;
+    }
+    
+    
+    
     
     return (
         <Fragment>
@@ -278,7 +265,7 @@ const Formulario = (props) => {
                                                         onChange={ handleChange }
                                                         onKeyDown={ onKeyDown }
                                                         value={ request.endpoint } 
-                                                        /> 
+                                                    /> 
                                                     {renderAutocomplete()}
                                             </div>
                                         </div>
@@ -295,23 +282,23 @@ const Formulario = (props) => {
                                                         type="text" 
                                                         name="id"
                                                         className="form-control mb-5" 
-                                                        placeholder="Coloca un / antes de ingresar el ID a Consultar"
+                                                        placeholder="Ingresar el ID a Consultar"
                                                         onChange={ handleChange } 
                                                         
-                                                        /> 
+                                                    /> 
                                             </div>
                                         </div>
                                     
                                         <div className="col-md-4">
                                             <div className="form-group"> 
-                                                <label>Token Publico</label> 
+                                                <label>Token Público</label> 
                                                     <input 
                                                         type="text" 
                                                         name="publico" 
                                                         className="form-control" 
-                                                        placeholder="Ingresa Token Publico" 
+                                                        placeholder="Ingresa Token Público" 
                                                         onChange={ handleChange }
-                                                        /> 
+                                                    /> 
                                             </div>
                                         </div>
 
@@ -341,7 +328,7 @@ const Formulario = (props) => {
                                             onChange={ handleChange }
                                         />
                                 </div>
-                                    <label>Este es el Path Generado<p>{request.url}{request.endpoint}{request.id}{sign}{request.sign}</p></label>
+                                    
                             
                                 <div className="col-md-12">
                                     <label>Campo de Respuesta </label>
@@ -353,7 +340,8 @@ const Formulario = (props) => {
                                             name="respuesta"
                                         />
                                 </div>
-                            
+                                
+                                { result && <div className="error-captcha"><label>Este es el Path Generado<p>{request.url}{request.endpoint}{request.id}</p></label></div>}                                         
                                 <div className="col-md-12">
                                     
                                      <div className="recaptcha">
