@@ -41,11 +41,12 @@ const Formulario = (props) => {
             suggestion =>
             suggestion.toLowerCase().indexOf(input.toLowerCase()) > -1
             );
-        // console.log("este es el input ",input)
+        console.log("este es el input ",input)
         setActive(0);
         setFiltered(newFilteredSuggestions);
         setIsShow(true);
         setInput(e.currentTarget.value)
+       
 
         
     };
@@ -154,7 +155,7 @@ const Formulario = (props) => {
         })
         setFiltered([]);
         setIsShow(false);
-        setInput(apiendpoint)
+        // setInput(apiendpoint)
     };
     
     const onKeyDown = e => {
@@ -163,7 +164,7 @@ const Formulario = (props) => {
             
             setActive(0);
             setIsShow(false);
-            setInput(filtered[active])
+            // setInput(filtered[active])
         }
         
         else if (e.keyCode === 38) { // flecha arriba
@@ -197,13 +198,13 @@ const Formulario = (props) => {
                 );
 
             } 
-            // else {
-            //       return (
-            //     <div className="no-autocomplete mb-4">
-            //       El EndPoint Seleccionado no coincide con ninguna busqueda
-            //     </div>
-            //   );
-            // }
+            else {
+                  return (
+                <div className="no-autocomplete mb-4">
+                  El EndPoint Seleccionado no coincide con ninguna busqueda
+                </div>
+              );
+            }
         }
                     
             return <></>;
@@ -265,6 +266,7 @@ const Formulario = (props) => {
                                                         onChange={ handleChange }
                                                         onKeyDown={ onKeyDown }
                                                         value={ request.endpoint } 
+                                                        onClick={click}
                                                     /> 
                                                     {renderAutocomplete()}
                                             </div>
@@ -341,7 +343,9 @@ const Formulario = (props) => {
                                         />
                                 </div>
                                 
-                                { result && <div><label>Este es el Path Generado:<p>{request.url}{request.endpoint}{request.id}{firma.Sign}</p></label></div>}                                         
+                                { result && <div><label>Este es el Path Generado:<p>{request.url}{request.endpoint}{request.id}</p></label></div>}
+
+                                { firma && <div><label>Esta transacción  genero la siguiente Firma:<p>{firma}</p></label></div>}                                         
                                
                                 <div className="col-md-12">
                                      <div className="recaptcha">
