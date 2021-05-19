@@ -8,6 +8,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 
 
 const Formulario = (props) => {
+    
 
 
     const [request, setRequest] = useState({id:''});
@@ -17,9 +18,11 @@ const Formulario = (props) => {
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
 
+    const [firma, setFirma] = useState('')
+    //patron flux
+
     //probando captcha
     const captcha = useRef(null)
-
     const [captchaValido, setCaptchaValido] = useState(null)
 
 
@@ -107,12 +110,9 @@ const Formulario = (props) => {
             const arrayConcat = new URLSearchParams(orderedData).toString()
             const concat = requestPath + "&" + arrayConcat;
             const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
-            // setResult(sign)
-            // if (sign.current.getValue()) {
-            //     console.log('esta es la firma', sign);
-            //     setFirmaValido(true)
-            // }
-            console.log('firma:', sign, "url", `${request.url}${path}${id}`)
+            setFirma(sign)
+            
+            console.log('firma:', sign)
             // console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
             
             return axios({
@@ -146,7 +146,7 @@ const Formulario = (props) => {
 
     const click = e => {
 
-        setActive(0);
+        // setActive(0);
         const apiendpoint = e.currentTarget.innerText;
         setRequest({
             ...request,
@@ -217,7 +217,7 @@ const Formulario = (props) => {
             <div className="container">
                 <div className="row">
                     <div className="col-md-8 offset-md-2">
-                        <form className="form" onSubmit={handleSubmit}>
+                        <form className="form" >
                             <div className="title mt-5">
                                 <h2>Sistema Interno Payku</h2>
                             </div>
@@ -341,9 +341,9 @@ const Formulario = (props) => {
                                         />
                                 </div>
                                 
-                                { result && <div className="error-captcha"><label>Este es el Path Generado<p>{request.url}{request.endpoint}{request.id}</p></label></div>}                                         
+                                { result && <div><label>Este es el Path Generado:<p>{request.url}{request.endpoint}{request.id}{firma.Sign}</p></label></div>}                                         
+                               
                                 <div className="col-md-12">
-                                    
                                      <div className="recaptcha">
                                         <ReCAPTCHA 
                                             ref = {captcha}
