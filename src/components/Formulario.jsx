@@ -3,13 +3,14 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
 import ReCAPTCHA from "react-google-recaptcha";
-
-
+// import { AutoSuggest } from "react-autosuggestions";
+// import { endpointOptions } from "./endpointOptions"
 
 
 const Formulario = (props) => {
-    
 
+    // const [formData, setFormData] = useState();
+    // const [state, setState] = useState();
 
     const [request, setRequest] = useState({id:''});
     const [result, setResult] = useState('');
@@ -17,16 +18,10 @@ const Formulario = (props) => {
     const [filtered, setFiltered] = useState([]);
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
-
     const [firma, setFirma] = useState('')
-    //patron flux
-
-    //probando captcha
     const captcha = useRef(null)
     const [captchaValido, setCaptchaValido] = useState(null)
 
-
-    
         
     const handleChange = (e) => {
         
@@ -34,128 +29,40 @@ const Formulario = (props) => {
           ...request,
           [e.target.name]: e.target.value,
         });
+
+        // const data = {
+        //     ...(state),
+            
+        // };
+        
+        
+        //   setFormData(data);
+        //   setState();
+         
         
         const { suggestions } = props;
-        const input = e.currentTarget.value;
+        const input = e.target.value;
         const newFilteredSuggestions = suggestions.filter(
             suggestion =>
             suggestion.toLowerCase().indexOf(input.toLowerCase()) > -1
-            );
-        console.log("este es el input ",input)
+        );
         setActive(0);
         setFiltered(newFilteredSuggestions);
         setIsShow(true);
-        setInput(e.currentTarget.value)
-       
-
-        
+        setInput(e.target.value)
     };
-
-   
-    const handleSubmit = (e) => {
-        e.preventDefault();  
-        setCaptchaValido(true)
-        //probando captcha
-        // console.log('valor captcha handle', captcha.current.getValue() )
-
-        if (captcha.current.getValue()) {
-
-            // console.log('no es un robot');
-            // console.log('entrando handleSubmit')
-            apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
-            .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
-            .catch(res => console.error(res.response))
-            setCaptchaValido(true)
-
-        } else {
-
-            console.log('acepta el captcha')
-            setCaptchaValido(false)
-        }
-        
-    }
-
-    const apiRequest = (method,path,sendData,publicToken,privateToken="",id="",sign="") => {
-       
-        let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
-       
-        let exampleJson = JSON.parse(dataExample)
-      
-        let sendDataCopy = '';
-
-        // const sign = '';
-
-        if(method === 'post' || method === 'put') {
-            try {
-
-                sendDataCopy = sendData
-                sendDataCopy = JSON.parse(sendDataCopy)         
-            
-            } catch (error) {
-
-                setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)} \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
-
-                
-            }            
-        }
-        
-               
-        if (`${request.endpoint}` === '/api/suclient/') {
-
-            const requestPath = encodeURIComponent(`${request.endpoint}`);
-            const orderedData = {};
-            Object.keys(sendDataCopy).sort().forEach(function(key) {
-                orderedData[key] = sendDataCopy[key];
-            })
-          
-            const arrayConcat = new URLSearchParams(orderedData).toString()
-            const concat = requestPath + "&" + arrayConcat;
-            const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
-            setFirma(sign)
-            
-            console.log('firma:', sign)
-            // console.log('mostrando datos, url, id, firma', `${request.url}${path}${id}`)
-            
-            return axios({
-                method: `${method}`,
-                url: `${request.url}${path}${id}`,
-                data: sendDataCopy,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${publicToken}`,
-                    'Sign': sign,  
-                }
-            })
-        
-        } 
-        else {
-            return axios({
-              method: `${method}`,
-              url: `${request.url}${path}${id}`,
-              data: sendDataCopy,
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${publicToken}`,
-                'Sign': sign,  
-              }
-            })
-
-        }
-        
-    }
-
 
     const click = e => {
 
-        // setActive(0);
-        const apiendpoint = e.currentTarget.innerText;
+        setActive(0);
+        const apiendpoint = e.target.innerText;
         setRequest({
             ...request,
             endpoint:apiendpoint
         })
         setFiltered([]);
         setIsShow(false);
-        // setInput(apiendpoint)
+        setInput(apiendpoint)
     };
     
     const onKeyDown = e => {
@@ -164,7 +71,7 @@ const Formulario = (props) => {
             
             setActive(0);
             setIsShow(false);
-            // setInput(filtered[active])
+            setInput(filtered[active])
         }
         
         else if (e.keyCode === 38) { // flecha arriba
@@ -198,21 +105,99 @@ const Formulario = (props) => {
                 );
 
             } 
-            else {
-                  return (
-                <div className="no-autocomplete mb-4">
-                  El EndPoint Seleccionado no coincide con ninguna busqueda
-                </div>
-              );
-            }
+            // else {
+            //       return (
+            //     <div className="no-autocomplete mb-4">
+            //       El EndPoint Seleccionado no coincide con ninguna busqueda
+            //     </div>
+            //   );
+            // }
         }
                     
             return <></>;
     }
     
-    
-    
-    
+   
+    const handleSubmit = (e) => {
+        e.preventDefault();  
+
+         
+
+        setCaptchaValido(true)
+
+        if (captcha.current.getValue()) {
+
+            apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
+            .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
+            .catch(res => console.error(res.response))
+            setCaptchaValido(true)
+
+        } else {
+
+            console.log('acepta el captcha')
+            setCaptchaValido(false)
+        }
+    }
+
+    const apiRequest = (method,path,sendData,publicToken,privateToken="",id="",sign="") => {
+       
+        let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
+       
+        let exampleJson = JSON.parse(dataExample)
+        let sendDataCopy = '';
+
+        if(method === 'post' || method === 'put') {
+            try {
+
+                sendDataCopy = sendData
+                sendDataCopy = JSON.parse(sendDataCopy)         
+            
+            } catch (error) {
+
+                setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)} \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
+            }            
+        }
+               
+        if (`${request.endpoint}` === '/api/suclient/') {
+
+            const requestPath = encodeURIComponent(`${request.endpoint}`);
+            const orderedData = {};
+            Object.keys(sendDataCopy).sort().forEach(function(key) {
+                orderedData[key] = sendDataCopy[key];
+            })
+          
+            const arrayConcat = new URLSearchParams(orderedData).toString()
+            const concat = requestPath + "&" + arrayConcat;
+            const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
+            setFirma(sign)
+            
+            return axios({
+                method: `${method}`,
+                url: `${request.url}${path}${id}`,
+                data: sendDataCopy,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${publicToken}`,
+                    'Sign': sign,  
+                }
+            })
+        
+        } 
+        else {
+            return axios({
+              method: `${method}`,
+              url: `${request.url}${path}${id}`,
+              data: sendDataCopy,
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${publicToken}`,
+                'Sign': sign,  
+              }
+            })
+
+        }
+    }
+
     return (
         <Fragment>
             <div className="container">
@@ -253,8 +238,6 @@ const Formulario = (props) => {
                                         </div>
                                     </div>
 
-                                    {/* Cuadro de texto del endpoint */}
-                                    
                                         <div className="col-md-4">
                                             <div className="form-group">
                                                 <label>Escribe el EndPoint</label>
@@ -271,9 +254,27 @@ const Formulario = (props) => {
                                                     {renderAutocomplete()}
                                             </div>
                                         </div>
+
+                                        {/* <div className="col-md-4">
+                                            <div className="form-group">
+                                                <label>Escribe el EndPoint</label>
+                                                <AutoSuggest
+                                                    name="endpoint"
+                                                    className="form-control mt-2 text-color" 
+                                                    placeholder="EndPoint"
+                                                    onChange={ handleChange }
+                                                    options={endpointOptions}
+                                                    handleChange={setState}
+                                                    value={state}
+                                                    
+                                                />
+                                            </div>
+                                        </div> */}
                                     
 
                                 </div>
+
+                               
                                    
                                     <div className="row">
                                         <div className="col-md-4">
@@ -290,6 +291,7 @@ const Formulario = (props) => {
                                                     /> 
                                             </div>
                                         </div>
+                                        
                                     
                                         <div className="col-md-4">
                                             <div className="form-group"> 
@@ -317,9 +319,6 @@ const Formulario = (props) => {
                                             </div>
                                         </div>
                                     </div>      
-                                    
-                                    
-                                        
                             
                                 <div className="col-md-12">
                                     <label>Ingreso de Datos </label>
@@ -376,26 +375,26 @@ export default Formulario
 
 
 
-//  // datos a enviar sign
-//     // {
-//     //     "email": "support@youwebsite.cl",
-//     //     "name": "Joe Doe",
-//     //     "phone": "923122312",
-//     //     "address": "Moneda 101",
-//     //     "country": "Chile",
-//     //     "region": "Metropolitana",
-//     //     "city": "Santiago",
-//     //     "postal_code": "850000"
-//     // }
-//     //  registrar datos
-//     // {
-//     //     "email": "support@youwebsite.cl",
-//     //     "order": 98745,
-//     //     "subject": "test subject",
-//     //     "amount": 25000,
-//     //     "payment": 1,
-//     //     "urlreturn": "https://youwebsite.com/urlreturn?orderClient=123",
-//     //     "urlnotify": "https://youwebsite.com/urlnotify?orderClient=123"
-//     // }
+ // datos a enviar sign
+    // {
+    //     "email": "support@youwebsite.cl",
+    //     "name": "Joe Doe",
+    //     "phone": "923122312",
+    //     "address": "Moneda 101",
+    //     "country": "Chile",
+    //     "region": "Metropolitana",
+    //     "city": "Santiago",
+    //     "postal_code": "850000"
+    // }
+    //  registrar datos
+    // {
+    //     "email": "support@youwebsite.cl",
+    //     "order": 98745,
+    //     "subject": "test subject",
+    //     "amount": 25000,
+    //     "payment": 1,
+    //     "urlreturn": "https://youwebsite.com/urlreturn?orderClient=123",
+    //     "urlnotify": "https://youwebsite.com/urlnotify?orderClient=123"
+    // }
 
                                                         
