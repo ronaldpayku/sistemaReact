@@ -3,14 +3,9 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
 import ReCAPTCHA from "react-google-recaptcha";
-// import { AutoSuggest } from "react-autosuggestions";
-// import { endpointOptions } from "./endpointOptions"
 
 
 const Formulario = (props) => {
-
-    // const [formData, setFormData] = useState();
-    // const [state, setState] = useState();
 
     const [request, setRequest] = useState({id:''});
     const [result, setResult] = useState('');
@@ -19,6 +14,7 @@ const Formulario = (props) => {
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
     const [firma, setFirma] = useState('')
+
     const captcha = useRef(null)
     const [captchaValido, setCaptchaValido] = useState(null)
 
@@ -30,16 +26,15 @@ const Formulario = (props) => {
           [e.target.name]: e.target.value,
         });
 
-        // const data = {
-        //     ...(state),
-            
-        // };
-        
-        
-        //   setFormData(data);
-        //   setState();
-         
-        
+    };
+
+    const submitHandler = (e) => {
+
+        setRequest({
+            ...request,
+            [e.target.name]: e.target.value,
+          });
+  
         const { suggestions } = props;
         const input = e.target.value;
         const newFilteredSuggestions = suggestions.filter(
@@ -50,7 +45,7 @@ const Formulario = (props) => {
         setFiltered(newFilteredSuggestions);
         setIsShow(true);
         setInput(e.target.value)
-    };
+    }
 
     const click = e => {
 
@@ -104,24 +99,20 @@ const Formulario = (props) => {
                     </ul>
                 );
 
-            } 
-            // else {
-            //       return (
-            //     <div className="no-autocomplete mb-4">
-            //       El EndPoint Seleccionado no coincide con ninguna busqueda
-            //     </div>
-            //   );
-            // }
+            } else {
+                return (
+                    <div className="no-autocomplete mb-4">
+                        El EndPoint Seleccionado no coincide con ninguna busqueda
+                    </div>
+                );
+            }
         }
-                    
             return <></>;
     }
     
    
     const handleSubmit = (e) => {
         e.preventDefault();  
-
-         
 
         setCaptchaValido(true)
 
@@ -246,7 +237,7 @@ const Formulario = (props) => {
                                                         name="endpoint"
                                                         className="form-control mt-2 text-color" 
                                                         placeholder="EndPoint"
-                                                        onChange={ handleChange }
+                                                        onChange={ submitHandler }
                                                         onKeyDown={ onKeyDown }
                                                         value={ request.endpoint } 
                                                         onClick={click}
@@ -254,27 +245,7 @@ const Formulario = (props) => {
                                                     {renderAutocomplete()}
                                             </div>
                                         </div>
-
-                                        {/* <div className="col-md-4">
-                                            <div className="form-group">
-                                                <label>Escribe el EndPoint</label>
-                                                <AutoSuggest
-                                                    name="endpoint"
-                                                    className="form-control mt-2 text-color" 
-                                                    placeholder="EndPoint"
-                                                    onChange={ handleChange }
-                                                    options={endpointOptions}
-                                                    handleChange={setState}
-                                                    value={state}
-                                                    
-                                                />
-                                            </div>
-                                        </div> */}
-                                    
-
                                 </div>
-
-                               
                                    
                                     <div className="row">
                                         <div className="col-md-4">
@@ -360,20 +331,16 @@ const Formulario = (props) => {
                                         <button className="me-md-2" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
                                     </div>
                                 </div>
-
                            
                         </form>
                     </div>
                 </div>
             </div>
-            
         </Fragment>
     )
 }
 
 export default Formulario
-
-
 
  // datos a enviar sign
     // {
