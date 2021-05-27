@@ -3,6 +3,7 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
 import ReCAPTCHA from "react-google-recaptcha";
+import { useForm } from 'react-hook-form';
 
 
 const Formulario = (props) => {
@@ -14,9 +15,14 @@ const Formulario = (props) => {
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
     const [firma, setFirma] = useState('')
+    // const [errorToken, setErrorToken] = useState(null)
+
 
     const captcha = useRef(null)
     const [captchaValido, setCaptchaValido] = useState(null)
+
+
+    const {register, errors} = useForm();
 
         
     const handleChange = (e) => {
@@ -26,9 +32,14 @@ const Formulario = (props) => {
           [e.target.name]: e.target.value,
         });
 
+        if (!`${request.publico}`.trim()){
+            console.log('vacio')
+            return
+        }
+        
     };
 
-    const submitHandler = (e) => {
+    const submitHandler = (e) => {        
 
         setRequest({
             ...request,
@@ -45,6 +56,7 @@ const Formulario = (props) => {
         setFiltered(newFilteredSuggestions);
         setIsShow(true);
         setInput(e.target.value)
+        setCaptchaValido(true)
     }
 
     const click = e => {
@@ -114,22 +126,35 @@ const Formulario = (props) => {
     const handleSubmit = (e) => {
         e.preventDefault();  
 
-        setCaptchaValido(true)
+       
 
+        
         if (captcha.current.getValue()) {
 
             apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
             .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
-            .catch(res => console.error(res.response))
-            setCaptchaValido(true)
+            .catch(res => setResult(JSON.stringify(res.response, null, 2)))
+            
 
         } else {
 
             console.log('acepta el captcha')
-            setCaptchaValido(false)
+            setCaptchaValido(true)
         }
+        captcha.current.reset()
+            
     }
 
+    // const formValidation = () => {
+    //     if ( `${request.publico}` === "" ){
+    //         setErrorToken(console.log('no puede ir en blanco'))
+    //         return true
+    //     } else {
+    //         setErrorToken(null)
+    //         return false
+    //     }    
+    // }
+    
     const apiRequest = (method,path,sendData,publicToken,privateToken="",id="",sign="") => {
        
         let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
@@ -200,9 +225,9 @@ const Formulario = (props) => {
                             </div>
 
                                 <div className="row">
-                                    <div className="col-md-4">
+                                    <div className="col-xl-4">
                                         <div className="form-group"> 
-                                            <label>Selecciona Plataforma</label> 
+                                            <label>Plataforma</label> 
                                                 <select onChange={ handleChange } 
                                                     name="url" 
                                                     className="form-control form-control-lg mb-5 mt-2 text-color">
@@ -214,9 +239,9 @@ const Formulario = (props) => {
                                         </div>
                                     </div>
                                     
-                                    <div className="col-md-4">
+                                    <div className="col-xl-4">
                                         <div className="form-group"> 
-                                            <label>Seleciona metodo a Solicitar</label> 
+                                            <label>Metodo</label> 
                                                 <select onChange={ handleChange } 
                                                 name="method" 
                                                 className="form-control form-control-lg mb-5 mt-2 text-color">
@@ -229,14 +254,14 @@ const Formulario = (props) => {
                                         </div>
                                     </div>
 
-                                        <div className="col-md-4">
-                                            <div className="form-group">
-                                                <label>Escribe el EndPoint</label>
+                                    <div className="col-xl-4">
+                                            <div className="form-group ">
+                                                <label>EndPoint</label>
                                                     <input
                                                         type="text" 
                                                         name="endpoint"
-                                                        className="form-control mt-2 text-color" 
-                                                        placeholder="EndPoint"
+                                                        className="form-control form-select mt-2 mb-5 text-color" 
+                                                        placeholder="Escribe el EndPoint"
                                                         onChange={ submitHandler }
                                                         onKeyDown={ onKeyDown }
                                                         value={ request.endpoint } 
@@ -245,10 +270,12 @@ const Formulario = (props) => {
                                                     {renderAutocomplete()}
                                             </div>
                                         </div>
+
+                                       
                                 </div>
                                    
                                     <div className="row">
-                                        <div className="col-md-4">
+                                        <div className="col-xl-4">
                                             <div className="form-group">
                                                 <label>Identificador</label>
                                                 
@@ -264,20 +291,29 @@ const Formulario = (props) => {
                                         </div>
                                         
                                     
-                                        <div className="col-md-4">
+                                        <div className="col-xl-4">
                                             <div className="form-group"> 
                                                 <label>Token Público</label> 
                                                     <input 
                                                         type="text" 
                                                         name="publico" 
-                                                        className="form-control" 
+                                                        className="form-control mb-5" 
                                                         placeholder="Ingresa Token Público" 
                                                         onChange={ handleChange }
+                                                        // {...register("publico", {required: true, maxLength: 80})}
+                                                        required
+                                                        pattern="[A-Za-z]{3}"
                                                     /> 
+                                                   
+                                                        {/* {`${request.publico}` === "required" && (
+                                                            <p>token requerido</p>
+                                                        )}
+                                                     */}
+                                                    
                                             </div>
                                         </div>
 
-                                        <div className="col-md-4">
+                                        <div className="col-xl-4">
                                             <div className="form-group"> 
                                                 <label>Token Privado</label> 
                                                     <input 
@@ -287,11 +323,12 @@ const Formulario = (props) => {
                                                         placeholder="Ingresa Token Privado"
                                                         onChange={ handleChange }
                                                     /> 
+                                                   
                                             </div>
                                         </div>
                                     </div>      
                             
-                                <div className="col-md-12">
+                                <div className="col--12">
                                     <label>Ingreso de Datos </label>
                                         <textarea
                                             name="codigo"
@@ -323,12 +360,13 @@ const Formulario = (props) => {
                                             ref = {captcha}
                                             sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
                                             onChange={ handleSubmit }
+                                            onExpired={ handleChange}
                                         />    
                                     </div>   
                                     { captchaValido === false && <div className="error-captcha">Por favor acepta el captcha</div>}                                         
                                     
                                     <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
-                                        <button className="me-md-2" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
+                                        <button className="me-md-2 mt-3" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
                                     </div>
                                 </div>
                            
@@ -364,4 +402,150 @@ export default Formulario
     //     "urlnotify": "https://youwebsite.com/urlnotify?orderClient=123"
     // }
 
-                                                        
+//     <Fragment>
+//     <div className="container">
+//         <div className="row">
+//             <div className="col-md-8 offset-md-2">
+//                 <form className="form" >
+//                     <div className="title mt-5">
+//                         <h2>Sistema Interno Payku</h2>
+//                     </div>
+
+//                         <div className="row">
+//                             <div className="col-md-4">
+//                                 <div className="form-group"> 
+//                                     <label>Selecciona Plataforma</label> 
+//                                         <select onChange={ handleChange } 
+//                                             name="url" 
+//                                             className="form-control form-control-lg mb-5 mt-2 text-color">
+//                                                 <option defaultValue selected disabled>Url</option>
+//                                                 <option value="https://des.payku.cl">Desarrollo</option>
+//                                                 <option value="https://app.payku.cl/">Produccion</option>
+//                                                 <option value="https://devqa.payku.cl/">QA</option>
+//                                         </select> 
+//                                 </div>
+//                             </div>
+                            
+//                             <div className="col-md-4">
+//                                 <div className="form-group"> 
+//                                     <label>Seleciona metodo a Solicitar</label> 
+//                                         <select onChange={ handleChange } 
+//                                         name="method" 
+//                                         className="form-control form-control-lg mb-5 mt-2 text-color">
+//                                             <option defaultValue selected disabled>Solicitud</option>
+//                                             <option value="get">GET</option>
+//                                             <option value="post">POST</option>
+//                                             <option value="put">PUT</option>
+//                                             <option value="delete">DELETE</option>
+//                                     </select> 
+//                                 </div>
+//                             </div>
+
+//                                 <div className="col-md-4">
+//                                     <div className="form-group">
+//                                         <label>Escribe el EndPoint</label>
+//                                             <input
+//                                                 type="text" 
+//                                                 name="endpoint"
+//                                                 className="form-control mt-2 text-color" 
+//                                                 placeholder="EndPoint"
+//                                                 onChange={ submitHandler }
+//                                                 onKeyDown={ onKeyDown }
+//                                                 value={ request.endpoint } 
+//                                                 onClick={click}
+//                                             /> 
+//                                             {renderAutocomplete()}
+//                                     </div>
+//                                 </div>
+//                         </div>
+                           
+//                             <div className="row">
+//                                 <div className="col-md-4">
+//                                     <div className="form-group">
+//                                         <label>Identificador</label>
+                                        
+//                                             <input
+//                                                 type="text" 
+//                                                 name="id"
+//                                                 className="form-control mb-5" 
+//                                                 placeholder="Ingresar el ID a Consultar"
+//                                                 onChange={ handleChange } 
+                                                
+//                                             /> 
+//                                     </div>
+//                                 </div>
+                                
+                            
+//                                 <div className="col-md-4">
+//                                     <div className="form-group"> 
+//                                         <label>Token Público</label> 
+//                                             <input 
+//                                                 type="text" 
+//                                                 name="publico" 
+//                                                 className="form-control" 
+//                                                 placeholder="Ingresa Token Público" 
+//                                                 onChange={ handleChange }
+//                                             /> 
+//                                     </div>
+//                                 </div>
+
+//                                 <div className="col-md-4">
+//                                     <div className="form-group"> 
+//                                         <label>Token Privado</label> 
+//                                             <input 
+//                                                 type="text" 
+//                                                 name="privado" 
+//                                                 className="form-control mb-5" 
+//                                                 placeholder="Ingresa Token Privado"
+//                                                 onChange={ handleChange }
+//                                             /> 
+//                                     </div>
+//                                 </div>
+//                             </div>      
+                    
+//                         <div className="col-md-12">
+//                             <label>Ingreso de Datos </label>
+//                                 <textarea
+//                                     name="codigo"
+//                                     className="form-control mb-5" 
+//                                     placeholder="Ingresa el Payload aqui"
+//                                     onChange={ handleChange }
+//                                 />
+//                         </div>
+                            
+                    
+//                         <div className="col-md-12">
+//                             <label>Campo de Respuesta </label>
+//                                 <textarea
+//                                     autoFocus={true}
+//                                     readOnly
+//                                     className="form-control x-large-textarea mb-5" 
+//                                     defaultValue= { result }
+//                                     name="respuesta"
+//                                 />
+//                         </div>
+                        
+//                         { result && <div><label>Este es el Path Generado:<p>{request.url}{request.endpoint}{request.id}</p></label></div>}
+
+//                         { firma && <div><label>Esta transacción  genero la siguiente Firma:<p>{firma}</p></label></div>}                                         
+                       
+//                         <div className="col-md-12">
+//                              <div className="recaptcha">
+//                                 <ReCAPTCHA 
+//                                     ref = {captcha}
+//                                     sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
+//                                     onChange={ handleSubmit }
+//                                 />    
+//                             </div>   
+//                             { captchaValido === false && <div className="error-captcha">Por favor acepta el captcha</div>}                                         
+                            
+//                             <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
+//                                 <button className="me-md-2" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
+//                             </div>
+//                         </div>
+                   
+//                 </form>
+//             </div>
+//         </div>
+//     </div>
+// </Fragment>

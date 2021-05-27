@@ -70,10 +70,12 @@ input {
   padding: 8px;
 }
 .autocomplete {
+  position: absolute;
+  background: #fff;
   border: 1px solid #999;
-  border-top-width: 0;
-  list-style: none;
-  margin-top: 0;
+  border-top-width: 0; 
+  list-style: none; 
+  margin-top: -2%; 
   max-height: 143px;
   overflow-y: auto;
   padding-left: 0;
@@ -86,7 +88,7 @@ input {
 .autocomplete li:hover {
   background-color: darkgray;
   cursor: pointer;
-  font-weight: 700;
+  /* font-weight: 700; */
 }
 .autocomplete li:not(:last-of-type) {
   border-bottom: 1px solid #999;
@@ -97,3 +99,55 @@ input {
 	color: red;
 	margin-bottom: 20px;
 }
+
+
+/* responsive */
+
+ /* @media only screen and (max-width: 950px) {
+  .form input {
+    width: 100%;
+    font-size: x-small;
+    padding: 10px;
+    margin-bottom: 25px;
+    border: 1;
+    outline: none;
+    /* border-radius: 2px; */
+  /* } */
+  /* .form-control {
+    width: 100%;
+    font-size: x-small;
+    padding: 10px;
+    margin-bottom: 25px;
+    border: 1;
+    outline: none; */
+    /* border-radius: 2px; */
+  /* } */
+  
+/* } */ 
+
+/*@media only screen and (max-width: 590px) {
+  .form{
+    width: 95%;
+    padding: 15px;
+  }
+  label {
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+  
+}
+
+@media screen and (max-width: 300px) {
+  .form{
+    width: 85%;
+    padding: 15px;
+  }
+  label {
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+  
+    
+  } */
+
+
