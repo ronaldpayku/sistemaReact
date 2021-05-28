@@ -3,26 +3,27 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
 import ReCAPTCHA from "react-google-recaptcha";
-import { useForm } from 'react-hook-form';
 
+//regex listo
+//validar consulta listo
+//token privado !transaction
+        
 
 const Formulario = (props) => {
 
-    const [request, setRequest] = useState({id:''});
+    const [request, setRequest] = useState({publico: '', privado:'', id:''});
     const [result, setResult] = useState('');
     const [active, setActive] = useState(0);
     const [filtered, setFiltered] = useState([]);
     const [isShow, setIsShow] = useState(false);
     const [input, setInput] = useState("");
     const [firma, setFirma] = useState('')
-    // const [errorToken, setErrorToken] = useState(null)
+    const [errors, setErrors] = useState('')
+    const [errorPrivado, setErrorPrivado] = useState('')
 
 
     const captcha = useRef(null)
     const [captchaValido, setCaptchaValido] = useState(null)
-
-
-    const {register, errors} = useForm();
 
         
     const handleChange = (e) => {
@@ -31,12 +32,6 @@ const Formulario = (props) => {
           ...request,
           [e.target.name]: e.target.value,
         });
-
-        if (!`${request.publico}`.trim()){
-            console.log('vacio')
-            return
-        }
-        
     };
 
     const submitHandler = (e) => {        
@@ -123,37 +118,81 @@ const Formulario = (props) => {
     }
     
    
-    const handleSubmit = (e) => {
+    const handleSubmit = (e,) => {
         e.preventDefault();  
 
-       
-
-        
-        if (captcha.current.getValue()) {
-
-            apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
-            .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
-            .catch(res => setResult(JSON.stringify(res.response, null, 2)))
+        if (`${request.endpoint}` === '/api/transaction'){
             
+            if (!`${request.publico}`.trim()){
+                let vacio = "Debes ingresar un token Publico valido"
+                console.log(vacio)
+                setErrors(vacio)
+            
+            } else if (`${request.publico}`.length < 32) {
+                let vacio = "Token Publico debe contener 32 caracteres"
+                console.log(vacio)
+                setErrors(vacio)
+            
+            } else if (!`${request.publico}`.match(/^[a-zA-Z0-9]+$/) ){
+                let vacio = "Token  Publico no debe contener caracteres especiales"
+                console.log(vacio)
+                setErrors(vacio)   
+            
+            } else {
+                if (captcha.current.getValue()) {
+    
+                    apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
+                    .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
+                    .catch(res => setResult(JSON.stringify(res.response, null, 2)))
+                    
+        
+                } else {
+        
+                    console.log('acepta el captcha')
+                    setCaptchaValido(true)
+                }
+                captcha.current.reset()
+    
+            }
 
+        } else if (!`${request.privado}`.trim()){
+
+            let vacioPrivado = "Debes ingresar un token Privado valido"
+            console.log(vacioPrivado)
+            setErrorPrivado(vacioPrivado)
+        
+        } else if (`${request.privado}`.length < 32) {
+            let vacioPrivado = "Token Privado debe contener 32 caracteres"
+            console.log(vacioPrivado)
+            setErrorPrivado(vacioPrivado)
+        
+        } else if (!`${request.privado}`.match(/^[a-zA-Z0-9]+$/) ){
+            let vacioPrivado = "Token Privado no debe contener caracteres especiales"
+            console.log(vacioPrivado)
+            setErrorPrivado(vacioPrivado)   
+        
         } else {
+            if (captcha.current.getValue()) {
 
-            console.log('acepta el captcha')
-            setCaptchaValido(true)
-        }
-        captcha.current.reset()
+                apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
+                .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
+                .catch(res => setResult(JSON.stringify(res.response, null, 2)))
+                
+    
+            } else {
+    
+                console.log('acepta el captcha')
+                setCaptchaValido(true)
+            }
+            captcha.current.reset()
+
+        } 
+        
+        // return
             
     }
 
-    // const formValidation = () => {
-    //     if ( `${request.publico}` === "" ){
-    //         setErrorToken(console.log('no puede ir en blanco'))
-    //         return true
-    //     } else {
-    //         setErrorToken(null)
-    //         return false
-    //     }    
-    // }
+    
     
     const apiRequest = (method,path,sendData,publicToken,privateToken="",id="",sign="") => {
        
@@ -214,6 +253,7 @@ const Formulario = (props) => {
         }
     }
 
+   
     return (
         <Fragment>
             <div className="container">
@@ -294,21 +334,17 @@ const Formulario = (props) => {
                                         <div className="col-xl-4">
                                             <div className="form-group"> 
                                                 <label>Token Público</label> 
+                                                <div className="error-token">
+                                                    { errors && <p>{errors}</p>}
+                                                </div>
                                                     <input 
                                                         type="text" 
                                                         name="publico" 
                                                         className="form-control mb-5" 
                                                         placeholder="Ingresa Token Público" 
                                                         onChange={ handleChange }
-                                                        // {...register("publico", {required: true, maxLength: 80})}
-                                                        required
-                                                        pattern="[A-Za-z]{3}"
                                                     /> 
-                                                   
-                                                        {/* {`${request.publico}` === "required" && (
-                                                            <p>token requerido</p>
-                                                        )}
-                                                     */}
+                                                  
                                                     
                                             </div>
                                         </div>
@@ -316,6 +352,9 @@ const Formulario = (props) => {
                                         <div className="col-xl-4">
                                             <div className="form-group"> 
                                                 <label>Token Privado</label> 
+                                                <div className="error-token">
+                                                    { errorPrivado && <p>{errorPrivado}</p>}
+                                                </div>
                                                     <input 
                                                         type="text" 
                                                         name="privado" 
@@ -402,150 +441,3 @@ export default Formulario
     //     "urlnotify": "https://youwebsite.com/urlnotify?orderClient=123"
     // }
 
-//     <Fragment>
-//     <div className="container">
-//         <div className="row">
-//             <div className="col-md-8 offset-md-2">
-//                 <form className="form" >
-//                     <div className="title mt-5">
-//                         <h2>Sistema Interno Payku</h2>
-//                     </div>
-
-//                         <div className="row">
-//                             <div className="col-md-4">
-//                                 <div className="form-group"> 
-//                                     <label>Selecciona Plataforma</label> 
-//                                         <select onChange={ handleChange } 
-//                                             name="url" 
-//                                             className="form-control form-control-lg mb-5 mt-2 text-color">
-//                                                 <option defaultValue selected disabled>Url</option>
-//                                                 <option value="https://des.payku.cl">Desarrollo</option>
-//                                                 <option value="https://app.payku.cl/">Produccion</option>
-//                                                 <option value="https://devqa.payku.cl/">QA</option>
-//                                         </select> 
-//                                 </div>
-//                             </div>
-                            
-//                             <div className="col-md-4">
-//                                 <div className="form-group"> 
-//                                     <label>Seleciona metodo a Solicitar</label> 
-//                                         <select onChange={ handleChange } 
-//                                         name="method" 
-//                                         className="form-control form-control-lg mb-5 mt-2 text-color">
-//                                             <option defaultValue selected disabled>Solicitud</option>
-//                                             <option value="get">GET</option>
-//                                             <option value="post">POST</option>
-//                                             <option value="put">PUT</option>
-//                                             <option value="delete">DELETE</option>
-//                                     </select> 
-//                                 </div>
-//                             </div>
-
-//                                 <div className="col-md-4">
-//                                     <div className="form-group">
-//                                         <label>Escribe el EndPoint</label>
-//                                             <input
-//                                                 type="text" 
-//                                                 name="endpoint"
-//                                                 className="form-control mt-2 text-color" 
-//                                                 placeholder="EndPoint"
-//                                                 onChange={ submitHandler }
-//                                                 onKeyDown={ onKeyDown }
-//                                                 value={ request.endpoint } 
-//                                                 onClick={click}
-//                                             /> 
-//                                             {renderAutocomplete()}
-//                                     </div>
-//                                 </div>
-//                         </div>
-                           
-//                             <div className="row">
-//                                 <div className="col-md-4">
-//                                     <div className="form-group">
-//                                         <label>Identificador</label>
-                                        
-//                                             <input
-//                                                 type="text" 
-//                                                 name="id"
-//                                                 className="form-control mb-5" 
-//                                                 placeholder="Ingresar el ID a Consultar"
-//                                                 onChange={ handleChange } 
-                                                
-//                                             /> 
-//                                     </div>
-//                                 </div>
-                                
-                            
-//                                 <div className="col-md-4">
-//                                     <div className="form-group"> 
-//                                         <label>Token Público</label> 
-//                                             <input 
-//                                                 type="text" 
-//                                                 name="publico" 
-//                                                 className="form-control" 
-//                                                 placeholder="Ingresa Token Público" 
-//                                                 onChange={ handleChange }
-//                                             /> 
-//                                     </div>
-//                                 </div>
-
-//                                 <div className="col-md-4">
-//                                     <div className="form-group"> 
-//                                         <label>Token Privado</label> 
-//                                             <input 
-//                                                 type="text" 
-//                                                 name="privado" 
-//                                                 className="form-control mb-5" 
-//                                                 placeholder="Ingresa Token Privado"
-//                                                 onChange={ handleChange }
-//                                             /> 
-//                                     </div>
-//                                 </div>
-//                             </div>      
-                    
-//                         <div className="col-md-12">
-//                             <label>Ingreso de Datos </label>
-//                                 <textarea
-//                                     name="codigo"
-//                                     className="form-control mb-5" 
-//                                     placeholder="Ingresa el Payload aqui"
-//                                     onChange={ handleChange }
-//                                 />
-//                         </div>
-                            
-                    
-//                         <div className="col-md-12">
-//                             <label>Campo de Respuesta </label>
-//                                 <textarea
-//                                     autoFocus={true}
-//                                     readOnly
-//                                     className="form-control x-large-textarea mb-5" 
-//                                     defaultValue= { result }
-//                                     name="respuesta"
-//                                 />
-//                         </div>
-                        
-//                         { result && <div><label>Este es el Path Generado:<p>{request.url}{request.endpoint}{request.id}</p></label></div>}
-
-//                         { firma && <div><label>Esta transacción  genero la siguiente Firma:<p>{firma}</p></label></div>}                                         
-                       
-//                         <div className="col-md-12">
-//                              <div className="recaptcha">
-//                                 <ReCAPTCHA 
-//                                     ref = {captcha}
-//                                     sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
-//                                     onChange={ handleSubmit }
-//                                 />    
-//                             </div>   
-//                             { captchaValido === false && <div className="error-captcha">Por favor acepta el captcha</div>}                                         
-                            
-//                             <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
-//                                 <button className="me-md-2" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
-//                             </div>
-//                         </div>
-                   
-//                 </form>
-//             </div>
-//         </div>
-//     </div>
-// </Fragment>
