@@ -4,14 +4,10 @@ import CryptoJS from 'crypto-js';
 import '../index'
 import ReCAPTCHA from "react-google-recaptcha";
 
-//regex listo
-//validar consulta listo
-//token privado !transaction
-        
 
 const Formulario = (props) => {
 
-    const [request, setRequest] = useState({publico: '', privado:'', id:''});
+    const [request, setRequest] = useState({publico: '', privado:'', id:'', endpoint: '/api/transaction'});
     const [result, setResult] = useState('');
     const [active, setActive] = useState(0);
     const [filtered, setFiltered] = useState([]);
@@ -20,11 +16,8 @@ const Formulario = (props) => {
     const [firma, setFirma] = useState('')
     const [errors, setErrors] = useState('')
     const [errorPrivado, setErrorPrivado] = useState('')
-
-
     const captcha = useRef(null)
     const [captchaValido, setCaptchaValido] = useState(null)
-
         
     const handleChange = (e) => {
         
@@ -118,81 +111,62 @@ const Formulario = (props) => {
     }
     
    
-    const handleSubmit = (e,) => {
+    const handleSubmit = (e) => {
         e.preventDefault();  
 
-        if (`${request.endpoint}` === '/api/transaction'){
-            
-            if (!`${request.publico}`.trim()){
-                let vacio = "Debes ingresar un token Publico valido"
-                console.log(vacio)
-                setErrors(vacio)
-            
-            } else if (`${request.publico}`.length < 32) {
-                let vacio = "Token Publico debe contener 32 caracteres"
-                console.log(vacio)
-                setErrors(vacio)
-            
-            } else if (!`${request.publico}`.match(/^[a-zA-Z0-9]+$/) ){
-                let vacio = "Token  Publico no debe contener caracteres especiales"
-                console.log(vacio)
-                setErrors(vacio)   
-            
-            } else {
-                if (captcha.current.getValue()) {
-    
-                    apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
-                    .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
-                    .catch(res => setResult(JSON.stringify(res.response, null, 2)))
-                    
+        let errores = ''
+
+        setCaptchaValido(true)
+        setErrors('')
+        setErrorPrivado('')
+       
+        if (!`${request.publico}`.trim()){
+            errores = "Debes ingresar un token Publico valido"
+            setErrors(errores)
         
-                } else {
+        } else if (`${request.publico}`.length !== 32) {
+            errores = "Token Publico debe contener 32 caracteres"
+            setErrors(errores)
         
-                    console.log('acepta el captcha')
-                    setCaptchaValido(true)
-                }
-                captcha.current.reset()
-    
+        } else if (!`${request.publico}`.match(/^[a-zA-Z0-9]+$/) ){
+            errores = "Token  Publico no debe contener caracteres especiales"
+            setErrors(errores)   
+        }
+        
+        if (`${request.endpoint}` !== '/api/transaction' ){
+
+            if (!`${request.privado}`.trim()){
+
+                errores = "Debes ingresar un token Privado valido"
+                setErrorPrivado(errores)
+        
+            } else if (`${request.privado}`.length !== 32) {
+                errores = "Token Privado debe contener 32 caracteres"
+                setErrorPrivado(errores)
+        
+            } else if (!`${request.privado}`.match(/^[a-zA-Z0-9]+$/) ){
+                errores = "Token Privado no debe contener caracteres especiales"
+                setErrorPrivado(errores)   
+        
             }
+        }        
+        
+        if ( captcha.current.getValue() && errores === '') {
 
-        } else if (!`${request.privado}`.trim()){
-
-            let vacioPrivado = "Debes ingresar un token Privado valido"
-            console.log(vacioPrivado)
-            setErrorPrivado(vacioPrivado)
-        
-        } else if (`${request.privado}`.length < 32) {
-            let vacioPrivado = "Token Privado debe contener 32 caracteres"
-            console.log(vacioPrivado)
-            setErrorPrivado(vacioPrivado)
-        
-        } else if (!`${request.privado}`.match(/^[a-zA-Z0-9]+$/) ){
-            let vacioPrivado = "Token Privado no debe contener caracteres especiales"
-            console.log(vacioPrivado)
-            setErrorPrivado(vacioPrivado)   
-        
+            apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
+            .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
+            .catch(res => setResult(JSON.stringify(res.response, null, 2)))
+    
         } else {
-            if (captcha.current.getValue()) {
-
-                apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
-                .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
-                .catch(res => setResult(JSON.stringify(res.response, null, 2)))
-                
     
-            } else {
-    
-                console.log('acepta el captcha')
-                setCaptchaValido(true)
-            }
-            captcha.current.reset()
-
-        } 
-        
-        // return
+            setCaptchaValido(true)
+        }
+        captcha.current.reset()
             
     }
+       
 
-    
+
     
     const apiRequest = (method,path,sendData,publicToken,privateToken="",id="",sign="") => {
        
@@ -236,7 +210,6 @@ const Formulario = (props) => {
                     'Sign': sign,  
                 }
             })
-        
         } 
         else {
             return axios({
@@ -310,7 +283,6 @@ const Formulario = (props) => {
                                                     {renderAutocomplete()}
                                             </div>
                                         </div>
-
                                        
                                 </div>
                                    
@@ -329,7 +301,6 @@ const Formulario = (props) => {
                                                     /> 
                                             </div>
                                         </div>
-                                        
                                     
                                         <div className="col-xl-4">
                                             <div className="form-group"> 
@@ -344,8 +315,6 @@ const Formulario = (props) => {
                                                         placeholder="Ingresa Token Público" 
                                                         onChange={ handleChange }
                                                     /> 
-                                                  
-                                                    
                                             </div>
                                         </div>
 
@@ -376,7 +345,6 @@ const Formulario = (props) => {
                                             onChange={ handleChange }
                                         />
                                 </div>
-                                    
                             
                                 <div className="col-md-12">
                                     <label>Campo de Respuesta </label>
@@ -418,26 +386,3 @@ const Formulario = (props) => {
 }
 
 export default Formulario
-
- // datos a enviar sign
-    // {
-    //     "email": "support@youwebsite.cl",
-    //     "name": "Joe Doe",
-    //     "phone": "923122312",
-    //     "address": "Moneda 101",
-    //     "country": "Chile",
-    //     "region": "Metropolitana",
-    //     "city": "Santiago",
-    //     "postal_code": "850000"
-    // }
-    //  registrar datos
-    // {
-    //     "email": "support@youwebsite.cl",
-    //     "order": 98745,
-    //     "subject": "test subject",
-    //     "amount": 25000,
-    //     "payment": 1,
-    //     "urlreturn": "https://youwebsite.com/urlreturn?orderClient=123",
-    //     "urlnotify": "https://youwebsite.com/urlnotify?orderClient=123"
-    // }
-
