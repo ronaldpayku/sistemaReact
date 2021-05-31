@@ -106,53 +106,6 @@ input {
   
 }
 
-/* responsive */
 
- /* @media only screen and (max-width: 950px) {
-  .form input {
-    width: 100%;
-    font-size: x-small;
-    padding: 10px;
-    margin-bottom: 25px;
-    border: 1;
-    outline: none;
-    /* border-radius: 2px; */
-  /* } */
-  /* .form-control {
-    width: 100%;
-    font-size: x-small;
-    padding: 10px;
-    margin-bottom: 25px;
-    border: 1;
-    outline: none; */
-    /* border-radius: 2px; */
-  /* } */
-  
-/* } */ 
-
-/*@media only screen and (max-width: 590px) {
-  .form{
-    width: 95%;
-    padding: 15px;
-  }
-  label {
-    font-size: 10px;
-    margin-bottom: 5px;
-  }
-  
-}
-
-@media screen and (max-width: 300px) {
-  .form{
-    width: 85%;
-    padding: 15px;
-  }
-  label {
-    font-size: 10px;
-    margin-bottom: 5px;
-  }
-  
-    
-  } */
 
 

@@ -115,21 +115,25 @@ const Formulario = (props) => {
         e.preventDefault();  
 
         let errores = ''
+        let dataParse = ''
+        let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
+        let exampleJson = JSON.parse(dataExample)
 
         setCaptchaValido(true)
         setErrors('')
         setErrorPrivado('')
+        setFirma('')
        
         if (!`${request.publico}`.trim()){
-            errores = "Debes ingresar un token Publico valido"
+            errores = "Debes ingresar un token Público valido"
             setErrors(errores)
         
         } else if (`${request.publico}`.length !== 32) {
-            errores = "Token Publico debe contener 32 caracteres"
+            errores = "Token Público debe contener 32 caracteres"
             setErrors(errores)
         
         } else if (!`${request.publico}`.match(/^[a-zA-Z0-9]+$/) ){
-            errores = "Token  Publico no debe contener caracteres especiales"
+            errores = "Token  Público no debe contener caracteres especiales"
             setErrors(errores)   
         }
         
@@ -150,26 +154,35 @@ const Formulario = (props) => {
         
             }
         }        
+        if(request.method === 'post' || request.method === 'put'){
+
+            try {
+                dataParse = JSON.parse(request.codigo)         
+            } catch (error) {
+    
+                errores = 'errorParse'
+                setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)} \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
+            }            
+            // console.log(dataParse);
+        }
         
         if ( captcha.current.getValue() && errores === '') {
 
             apiRequest(`${request.method}`, `${request.endpoint}`, `${request.codigo}`, `${request.publico}`, `${request.privado}`, `${request.id}`)
             .then(axiosRes => setResult(JSON.stringify(axiosRes.data, null, 2)))
             .catch(res => setResult(JSON.stringify(res.response, null, 2)))
+            setCaptchaValido(true)
     
         } else {
     
-            setCaptchaValido(true)
+            setCaptchaValido(false)
         }
         captcha.current.reset()
-            
+        
     }
-       
-
-
     
     const apiRequest = (method,path,sendData,publicToken,privateToken="",id="",sign="") => {
-       
+        
         let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
        
         let exampleJson = JSON.parse(dataExample)
@@ -187,7 +200,7 @@ const Formulario = (props) => {
             }            
         }
                
-        if (`${request.endpoint}` === '/api/suclient/') {
+        if (`${request.endpoint}` !== '/api/transaction') {
 
             const requestPath = encodeURIComponent(`${request.endpoint}`);
             const orderedData = {};
@@ -197,8 +210,9 @@ const Formulario = (props) => {
           
             const arrayConcat = new URLSearchParams(orderedData).toString()
             const concat = requestPath + "&" + arrayConcat;
-            const sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
+            sign = CryptoJS.HmacSHA256(concat, `${privateToken}`).toString();
             setFirma(sign)
+        }
             
             return axios({
                 method: `${method}`,
@@ -210,20 +224,6 @@ const Formulario = (props) => {
                     'Sign': sign,  
                 }
             })
-        } 
-        else {
-            return axios({
-              method: `${method}`,
-              url: `${request.url}${path}${id}`,
-              data: sendDataCopy,
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${publicToken}`,
-                'Sign': sign,  
-              }
-            })
-
-        }
     }
 
    
@@ -246,8 +246,8 @@ const Formulario = (props) => {
                                                     className="form-control form-control-lg mb-5 mt-2 text-color">
                                                         <option defaultValue selected disabled>Url</option>
                                                         <option value="https://des.payku.cl">Desarrollo</option>
-                                                        <option value="https://app.payku.cl/">Produccion</option>
-                                                        <option value="https://devqa.payku.cl/">QA</option>
+                                                        <option value="https://app.payku.cl">Produccion</option>
+                                                        <option value="https://devqa.payku.cl">QA</option>
                                                 </select> 
                                         </div>
                                     </div>
@@ -283,7 +283,6 @@ const Formulario = (props) => {
                                                     {renderAutocomplete()}
                                             </div>
                                         </div>
-                                       
                                 </div>
                                    
                                     <div className="row">
@@ -295,7 +294,7 @@ const Formulario = (props) => {
                                                         type="text" 
                                                         name="id"
                                                         className="form-control mb-5" 
-                                                        placeholder="Ingresar el ID a Consultar"
+                                                        placeholder="Coloca un / y luego el ID a Consultar"
                                                         onChange={ handleChange } 
                                                         
                                                     /> 
@@ -359,7 +358,7 @@ const Formulario = (props) => {
                                 
                                 { result && <div><label>Este es el Path Generado:<p>{request.url}{request.endpoint}{request.id}</p></label></div>}
 
-                                { firma && <div><label>Esta transacción  genero la siguiente Firma:<p>{firma}</p></label></div>}                                         
+                                { firma  && <div><label>Esta transacción  genero la siguiente Firma:<p>{firma}</p></label></div>}                                         
                                
                                 <div className="col-md-12">
                                      <div className="recaptcha">
