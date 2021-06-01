@@ -7,7 +7,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 
 const Formulario = (props) => {
 
-    const [request, setRequest] = useState({publico: '', privado:'', id:'', endpoint: '/api/transaction'});
+    const [request, setRequest] = useState({publico: '', privado:'', id:'', endpoint: ''});
     const [result, setResult] = useState('');
     const [active, setActive] = useState(0);
     const [filtered, setFiltered] = useState([]);
@@ -183,7 +183,7 @@ const Formulario = (props) => {
     
     const apiRequest = (method,path,sendData,publicToken,privateToken="",id="",sign="") => {
         
-        let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
+        let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","rut": "11111111","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
        
         let exampleJson = JSON.parse(dataExample)
         let sendDataCopy = '';
@@ -202,7 +202,7 @@ const Formulario = (props) => {
                
         if (`${request.endpoint}` !== '/api/transaction') {
 
-            const requestPath = encodeURIComponent(`${request.endpoint}`);
+            const requestPath = encodeURIComponent(`${request.endpoint}${request.id}`);
             const orderedData = {};
             Object.keys(sendDataCopy).sort().forEach(function(key) {
                 orderedData[key] = sendDataCopy[key];
