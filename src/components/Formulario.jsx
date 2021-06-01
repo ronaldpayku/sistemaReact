@@ -163,7 +163,7 @@ const Formulario = (props) => {
                 errores = 'errorParse'
                 setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)} \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
             }            
-            // console.log(dataParse);
+            console.log(dataParse);
         }
         
         if ( captcha.current.getValue() && errores === '') {
