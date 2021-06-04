@@ -293,7 +293,7 @@ const Formulario = (props) => {
                                                         type="text" 
                                                         name="id"
                                                         className="form-control mb-5" 
-                                                        placeholder="Coloca un / y luego el ID a Consultar"
+                                                        placeholder="Ingresa el ID a Consultar"
                                                         onChange={ handleChange } 
                                                     /> 
                                             </div>
