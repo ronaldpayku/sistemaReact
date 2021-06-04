@@ -116,7 +116,7 @@ const Formulario = (props) => {
 
         let errores = ''
         let dataParse = ''
-        let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
+        let dataExample = '{"email": "support@youwebsite.cl","name": "Joe Doe","rut": "11111111","phone": "923122312","address":"Moneda101","country": "Chile","region": "Metropolitana","city": "Santiago","postal_code": "850000"}'
         let exampleJson = JSON.parse(dataExample)
 
         setCaptchaValido(true)
@@ -137,7 +137,7 @@ const Formulario = (props) => {
             setErrors(errores)   
         }
         
-        if (`${request.endpoint}` !== '/api/transaction' ){
+        if (`${request.endpoint}` !== '/api/transaction/' ){
 
             if (!`${request.privado}`.trim()){
 
@@ -163,7 +163,7 @@ const Formulario = (props) => {
                 errores = 'errorParse'
                 setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)} \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
             }            
-            console.log(dataParse);
+            // console.log(dataParse);
         }
         
         if ( captcha.current.getValue() && errores === '') {
@@ -200,7 +200,7 @@ const Formulario = (props) => {
             }            
         }
                
-        if (`${request.endpoint}` !== '/api/transaction') {
+        if (`${request.endpoint}` !== '/api/transaction/') {
 
             const requestPath = encodeURIComponent(`${request.endpoint}${request.id}`);
             const orderedData = {};
@@ -289,14 +289,12 @@ const Formulario = (props) => {
                                         <div className="col-xl-4">
                                             <div className="form-group">
                                                 <label>Identificador</label>
-                                                
                                                     <input
                                                         type="text" 
                                                         name="id"
                                                         className="form-control mb-5" 
                                                         placeholder="Coloca un / y luego el ID a Consultar"
                                                         onChange={ handleChange } 
-                                                        
                                                     /> 
                                             </div>
                                         </div>
@@ -330,7 +328,6 @@ const Formulario = (props) => {
                                                         placeholder="Ingresa Token Privado"
                                                         onChange={ handleChange }
                                                     /> 
-                                                   
                                             </div>
                                         </div>
                                     </div>      
