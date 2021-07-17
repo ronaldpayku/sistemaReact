@@ -21,7 +21,8 @@ function App() {
           "/urlnotifysuscription/",
           "/urlnotifypayment/",
           "/api/event/",
-          "/api/mall/"
+          "/api/mall/",
+          "/api/escrow/"
         ]}
        /> 
     </div>
