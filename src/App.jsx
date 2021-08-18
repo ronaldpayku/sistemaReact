@@ -12,7 +12,7 @@ function App() {
           "/api/maclient/", 
           "/api/maaffiliation/",
           "/api/suclient/", 
-          "/api/suclient/customers/", 
+          "/api/suclient/customers?page=1&per_page=100", 
           "/api/sususcription/",
           "/api/sususcriptionv2/", 
           "/api/sutransaction/", 
