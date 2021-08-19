@@ -288,12 +288,12 @@ const Formulario = (props) => {
                                     <div className="row">
                                         <div className="col-xl-4">
                                             <div className="form-group">
-                                                <label>Identificador</label>
+                                                <label>Parámetros Get</label>
                                                     <input
                                                         type="text" 
                                                         name="id"
                                                         className="form-control mb-5" 
-                                                        placeholder="Ingresa el ID a Consultar"
+                                                        placeholder="Ingresa Parámetros a Consultar"
                                                         onChange={ handleChange } 
                                                     /> 
                                             </div>
@@ -364,7 +364,7 @@ const Formulario = (props) => {
                                             sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
                                             onChange={ handleSubmit }
                                             onExpired={ handleChange}
-                                        />    
+                                         />     
                                     </div>   
                                     { captchaValido === false && <div className="error-captcha">Por favor acepta el captcha</div>}                                         
                                     
