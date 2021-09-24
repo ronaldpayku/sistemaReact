@@ -2,6 +2,7 @@ import React, { Fragment, useState, useRef } from 'react'
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import '../index'
+import payku from '../payku.png';
 import ReCAPTCHA from "react-google-recaptcha";
 
 
@@ -163,7 +164,7 @@ const Formulario = (props) => {
                 errores = 'errorParse'
                 setResult(`Ha habido un error en el formato de los datos enviados por favor revisa que este escrito de la siguiente manera:  \n ${JSON.stringify(exampleJson, null, 2)} \n y rectifica que la ultima linea de los valores NO lleve una coma(,)` )
             }            
-            // console.log(dataParse);
+            console.log(dataParse);
         }
         
         if ( captcha.current.getValue() && errores === '') {
@@ -175,8 +176,8 @@ const Formulario = (props) => {
     
         } else {
     
-            setCaptchaValido(false)
-        }
+           setCaptchaValido(false)
+       }
         captcha.current.reset()
         
     }
@@ -228,13 +229,20 @@ const Formulario = (props) => {
 
    
     return (
-        <Fragment>
-            <div className="container">
+        <Fragment>           
+            <div className="container">                
+                <nav className="navbar" >
+                    <div className="navbar-brand">
+                        <img src={payku} alt="payku-logo" width="265"/>
+                        {/* <img src="https://storage.googleapis.com/storage-payku-prd/public/img/payku2020_2.svg" width="215" height="80" alt="payku"/> */}
+                    </div>
+                </nav>
+
                 <div className="row">
-                    <div className="col-md-8 offset-md-2">
+                    <div className="col-md-8 offset-md-2">                        
                         <form className="form" >
-                            <div className="title mt-5">
-                                <h2>Sistema Interno Payku</h2>
+                            <div className="title text-color">
+                                <h2>Consultas Api Payku</h2>
                             </div>
 
                                 <div className="row">
@@ -273,7 +281,7 @@ const Formulario = (props) => {
                                                     <input
                                                         type="text" 
                                                         name="endpoint"
-                                                        className="form-control form-select mt-2 mb-5 text-color" 
+                                                        className="form-control form-select mt-2 mb-5 letras" 
                                                         placeholder="Escribe el EndPoint"
                                                         onChange={ submitHandler }
                                                         onKeyDown={ onKeyDown }
@@ -292,7 +300,7 @@ const Formulario = (props) => {
                                                     <input
                                                         type="text" 
                                                         name="id"
-                                                        className="form-control mb-5" 
+                                                        className="form-control mb-5 letras" 
                                                         placeholder="Ingresa Parámetros a Consultar"
                                                         onChange={ handleChange } 
                                                     /> 
@@ -308,7 +316,7 @@ const Formulario = (props) => {
                                                     <input 
                                                         type="text" 
                                                         name="publico" 
-                                                        className="form-control mb-5" 
+                                                        className="form-control mb-5 letras" 
                                                         placeholder="Ingresa Token Público" 
                                                         onChange={ handleChange }
                                                     /> 
@@ -324,7 +332,7 @@ const Formulario = (props) => {
                                                     <input 
                                                         type="text" 
                                                         name="privado" 
-                                                        className="form-control mb-5" 
+                                                        className="form-control mb-5 letras" 
                                                         placeholder="Ingresa Token Privado"
                                                         onChange={ handleChange }
                                                     /> 
@@ -336,7 +344,7 @@ const Formulario = (props) => {
                                     <label>Ingreso de Datos </label>
                                         <textarea
                                             name="codigo"
-                                            className="form-control mb-5" 
+                                            className="form-control mb-5 letras" 
                                             placeholder="Ingresa el Payload aqui"
                                             onChange={ handleChange }
                                         />
@@ -357,7 +365,7 @@ const Formulario = (props) => {
 
                                 { firma  && <div><label>Esta transacción  genero la siguiente Firma:<p>{firma}</p></label></div>}                                         
                                
-                                <div className="col-md-12">
+                                <div className="col-md-12"> 
                                      <div className="recaptcha">
                                         <ReCAPTCHA 
                                             ref = {captcha}
@@ -365,18 +373,20 @@ const Formulario = (props) => {
                                             onChange={ handleSubmit }
                                             onExpired={ handleChange}
                                          />     
-                                    </div>   
+                                    </div>  
                                     { captchaValido === false && <div className="error-captcha">Por favor acepta el captcha</div>}                                         
                                     
                                     <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
                                         <button className="me-md-2 mt-3" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
                                     </div>
-                                </div>
-                           
+                                </div>         
                         </form>
+                        <footer className="text-color mb-5">
+                            &copy; 2016-2021 | Payku Spa
+                        </footer>
                     </div>
                 </div>
-            </div>
+            </div>  
         </Fragment>
     )
 }
