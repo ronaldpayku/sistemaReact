@@ -15,6 +15,7 @@ function App() {
           "/api/suclient/customers", 
           "/api/sususcription/",
           "/api/sususcriptionv2/", 
+          "/api/sususcriptionv3/",
           "/api/sutransaction/", 
           "/api/suinscriptionscards/", 
           "/api/suplan/",
