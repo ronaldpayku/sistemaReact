@@ -250,7 +250,7 @@ const Formulario = (props) => {
                                                     <select onChange={ handleChange } 
                                                         name="url" 
                                                         className="form-control form-control-lg mb-5 mt-2 text-color">
-                                                            <option selected value="https://des.payku.cl">Desarrollo</option>
+                                                            <option value="https://des.payku.cl">Desarrollo</option>
                                                             <option value="https://app.payku.cl">Produccion</option>
                                                             <option value="https://devqa.payku.cl">QA</option>
                                                     </select> 
