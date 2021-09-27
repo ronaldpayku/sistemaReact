@@ -1,14 +1,13 @@
 import React, { Fragment, useState, useRef } from 'react'
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
-import '../index'
-import payku from '../payku.png';
+import '../index';
 import ReCAPTCHA from "react-google-recaptcha";
 
 
 const Formulario = (props) => {
 
-    const [request, setRequest] = useState({publico: '', privado:'', id:'', endpoint: ''});
+    const [request, setRequest] = useState({url: 'https://des.payku.cl', publico: '', privado:'', id:'', endpoint: '', method: 'get'});
     const [result, setResult] = useState('');
     const [active, setActive] = useState(0);
     const [filtered, setFiltered] = useState([]);
@@ -226,166 +225,164 @@ const Formulario = (props) => {
                 }
             })
     }
-
-   
+    
     return (
         <Fragment>           
-            <div className="container">                
-                <nav className="navbar" >
-                    <div className="navbar-brand">
-                        <img src={payku} alt="payku-logo" width="265"/>
-                        {/* <img src="https://storage.googleapis.com/storage-payku-prd/public/img/payku2020_2.svg" width="215" height="80" alt="payku"/> */}
-                    </div>
-                </nav>
+            <div className="container"> 
+                <div className="card card-styles">
+                    <nav className="navbar" >
+                        <div className="navbar-brand">
+                            <img src="https://storage.googleapis.com/storage-payku-prd/public/img/payku2020_2.svg" width="156" height="80" alt="payku"/>
+                        </div>
+                    </nav>
 
-                <div className="row">
-                    <div className="col-md-8 offset-md-2">                        
-                        <form className="form" >
-                            <div className="title text-color">
-                                <h2>Consultas Api Payku</h2>
-                            </div>
-
-                                <div className="row">
-                                    <div className="col-xl-4">
-                                        <div className="form-group"> 
-                                            <label>Plataforma</label> 
-                                                <select onChange={ handleChange } 
-                                                    name="url" 
-                                                    className="form-control form-control-lg mb-5 mt-2 text-color">
-                                                        <option defaultValue selected disabled>Url</option>
-                                                        <option value="https://des.payku.cl">Desarrollo</option>
-                                                        <option value="https://app.payku.cl">Produccion</option>
-                                                        <option value="https://devqa.payku.cl">QA</option>
-                                                </select> 
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="col-xl-4">
-                                        <div className="form-group"> 
-                                            <label>Metodo</label> 
-                                                <select onChange={ handleChange } 
-                                                name="method" 
-                                                className="form-control form-control-lg mb-5 mt-2 text-color">
-                                                    <option defaultValue selected disabled>Solicitud</option>
-                                                    <option value="get">GET</option>
-                                                    <option value="post">POST</option>
-                                                    <option value="put">PUT</option>
-                                                    <option value="delete">DELETE</option>
-                                            </select> 
-                                        </div>
-                                    </div>
-
-                                    <div className="col-xl-4">
-                                            <div className="form-group ">
-                                                <label>EndPoint</label>
-                                                    <input
-                                                        type="text" 
-                                                        name="endpoint"
-                                                        className="form-control form-select mt-2 mb-5 letras" 
-                                                        placeholder="Escribe el EndPoint"
-                                                        onChange={ submitHandler }
-                                                        onKeyDown={ onKeyDown }
-                                                        value={ request.endpoint } 
-                                                        onClick={click}
-                                                    /> 
-                                                    {renderAutocomplete()}
-                                            </div>
-                                        </div>
+                    <div className="row">
+                        <div className="col-md-10 offset-md-1">                        
+                            <form className="form" >
+                                <div className="title text-color">
+                                    <h2>Consultas Api Payku</h2>
                                 </div>
-                                   
+
                                     <div className="row">
                                         <div className="col-xl-4">
-                                            <div className="form-group">
-                                                <label>Parámetros Get</label>
-                                                    <input
-                                                        type="text" 
-                                                        name="id"
-                                                        className="form-control mb-5 letras" 
-                                                        placeholder="Ingresa Parámetros a Consultar"
-                                                        onChange={ handleChange } 
-                                                    /> 
+                                            <div className="form-group"> 
+                                                <label>Plataforma</label> 
+                                                    <select onChange={ handleChange } 
+                                                        name="url" 
+                                                        className="form-control form-control-lg mb-5 mt-2 text-color">
+                                                            <option selected value="https://des.payku.cl">Desarrollo</option>
+                                                            <option value="https://app.payku.cl">Produccion</option>
+                                                            <option value="https://devqa.payku.cl">QA</option>
+                                                    </select> 
                                             </div>
                                         </div>
-                                    
+                                        
                                         <div className="col-xl-4">
                                             <div className="form-group"> 
-                                                <label>Token Público</label> 
-                                                <div className="error-token">
-                                                    { errors && <p>{errors}</p>}
-                                                </div>
-                                                    <input 
-                                                        type="text" 
-                                                        name="publico" 
-                                                        className="form-control mb-5 letras" 
-                                                        placeholder="Ingresa Token Público" 
-                                                        onChange={ handleChange }
-                                                    /> 
+                                                <label>Metodo</label> 
+                                                    <select onChange={ handleChange } 
+                                                    name="method" 
+                                                    className="form-control form-control-lg mb-5 mt-2 text-color">
+                                                        <option value="get">GET</option>
+                                                        <option value="post">POST</option>
+                                                        <option value="put">PUT</option>
+                                                        <option value="delete">DELETE</option>
+                                                </select> 
                                             </div>
                                         </div>
 
                                         <div className="col-xl-4">
-                                            <div className="form-group"> 
-                                                <label>Token Privado</label> 
-                                                <div className="error-token">
-                                                    { errorPrivado && <p>{errorPrivado}</p>}
+                                                <div className="form-group ">
+                                                    <label>EndPoint</label>
+                                                        <input
+                                                            type="text" 
+                                                            name="endpoint"
+                                                            className="form-control form-select mt-2 mb-5 letras" 
+                                                            placeholder="Escribe el EndPoint"
+                                                            onChange={ submitHandler }
+                                                            onKeyDown={ onKeyDown }
+                                                            value={ request.endpoint } 
+                                                            onClick={click}
+                                                        /> 
+                                                        {renderAutocomplete()}
                                                 </div>
-                                                    <input 
-                                                        type="text" 
-                                                        name="privado" 
-                                                        className="form-control mb-5 letras" 
-                                                        placeholder="Ingresa Token Privado"
-                                                        onChange={ handleChange }
-                                                    /> 
                                             </div>
-                                        </div>
-                                    </div>      
-                            
-                                <div className="col--12">
-                                    <label>Ingreso de Datos </label>
-                                        <textarea
-                                            name="codigo"
-                                            className="form-control mb-5 letras" 
-                                            placeholder="Ingresa el Payload aqui"
-                                            onChange={ handleChange }
-                                        />
-                                </div>
-                            
-                                <div className="col-md-12">
-                                    <label>Campo de Respuesta </label>
-                                        <textarea
-                                            autoFocus={true}
-                                            readOnly
-                                            className="form-control x-large-textarea mb-5" 
-                                            defaultValue= { result }
-                                            name="respuesta"
-                                        />
-                                </div>
-                                
-                                { result && <div><label>Este es el Path Generado:<p>{request.url}{request.endpoint}{request.id}</p></label></div>}
-
-                                { firma  && <div><label>Esta transacción  genero la siguiente Firma:<p>{firma}</p></label></div>}                                         
-                               
-                                <div className="col-md-12"> 
-                                     <div className="recaptcha">
-                                        <ReCAPTCHA 
-                                            ref = {captcha}
-                                            sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
-                                            onChange={ handleSubmit }
-                                            onExpired={ handleChange}
-                                         />     
-                                    </div>  
-                                    { captchaValido === false && <div className="error-captcha">Por favor acepta el captcha</div>}                                         
-                                    
-                                    <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
-                                        <button className="me-md-2 mt-3" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
                                     </div>
-                                </div>         
-                        </form>
-                        <footer className="text-color mb-5">
-                            &copy; 2016-2021 | Payku Spa
-                        </footer>
+                                    
+                                        <div className="row">
+                                            <div className="col-xl-4">
+                                                <div className="form-group">
+                                                    <label>Parámetros Get</label>
+                                                        <input
+                                                            type="text" 
+                                                            name="id"
+                                                            className="form-control mb-5 letras" 
+                                                            placeholder="Ingresa Parámetros a Consultar"
+                                                            onChange={ handleChange } 
+                                                            /> 
+                                                </div>
+                                            </div>
+                                        
+                                            <div className="col-xl-4">
+                                                <div className="form-group"> 
+                                                    <label>Token Público</label> 
+                                                    <div className="error-token">
+                                                        { errors && <p>{errors}</p>}
+                                                    </div>
+                                                        <input 
+                                                            type="text" 
+                                                            name="publico" 
+                                                            className="form-control mb-5 letras" 
+                                                            placeholder="Ingresa Token Público" 
+                                                            onChange={ handleChange }
+                                                            /> 
+                                                </div>
+                                            </div>
+
+                                            <div className="col-xl-4">
+                                                <div className="form-group"> 
+                                                    <label>Token Privado</label> 
+                                                    <div className="error-token">
+                                                        { errorPrivado && <p>{errorPrivado}</p>}
+                                                    </div>
+                                                        <input 
+                                                            type="text" 
+                                                            name="privado" 
+                                                            className="form-control mb-5 letras" 
+                                                            placeholder="Ingresa Token Privado"
+                                                            onChange={ handleChange }
+                                                            /> 
+                                                </div>
+                                            </div>
+                                        </div>      
+                                
+                                    <div className="col--12">
+                                        <label>Ingreso de Datos </label>
+                                            <textarea
+                                                name="codigo"
+                                                className="form-control mb-5 letras" 
+                                                placeholder="Ingresa el Payload aqui"
+                                                onChange={ handleChange }
+                                                />
+                                    </div>
+                                
+                                    <div className="col-md-12">
+                                        <label>Campo de Respuesta </label>
+                                            <textarea
+                                                autoFocus={true}
+                                                readOnly
+                                                className="form-control x-large-textarea mb-5" 
+                                                defaultValue= { result }
+                                                name="respuesta"
+                                                />
+                                    </div>
+                                    
+                                    { result && <div><label>Este es el Path Generado:<p>{request.url}{request.endpoint}{request.id}</p></label></div>}
+
+                                    { firma  && <div><label>Esta transacción  genero la siguiente Firma:<p>{firma}</p></label></div>}                                         
+                                
+                                    <div className="col-md-12"> 
+                                        <div className="recaptcha">
+                                            <ReCAPTCHA 
+                                                ref = {captcha}
+                                                sitekey = "6LeU9NQaAAAAADraJAOsjgwjsStGWlp6zm_Td2Ka"
+                                                onChange={ handleSubmit }
+                                                onExpired={ handleChange}
+                                                />     
+                                        </div>  
+                                        { captchaValido === false && <div className="error-captcha">Por favor acepta el captcha</div>}                                         
+                                        
+                                        <div className="contact-btn gap-2 d-md-flex justify-content-md-end pb-5">
+                                            <button className="me-md-2 mt-3" onClick={ handleSubmit } type="submit">Enviar Solicitud</button>
+                                        </div>
+                                    </div>         
+                            </form>
+                            <footer className="text-color mb-5">
+                                &copy; 2016-2021 | Payku Spa
+                            </footer>
+                        </div>
                     </div>
-                </div>
+                </div>               
             </div>  
         </Fragment>
     )
